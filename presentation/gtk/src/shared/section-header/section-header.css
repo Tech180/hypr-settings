@@ -1,0 +1,38 @@
+.section-header {
+  margin-bottom: 16px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: @hs_fg;
+}
+
+.section-title--small {
+  font-size: 14px;
+}
+
+.section-subtitle {
+  font-size: 13px;
+  color: @hs_dim;
+}
+
+.hs-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid alpha(@hs_accent, 0.3);
+  background: alpha(@hs_accent, 0.1);
+  color: @hs_accent;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-feature-settings: "tnum";
+}
+
+.hs-badge--tag {
+  border-color: alpha(@hs_dim, 0.4);
+  background: alpha(@hs_dim, 0.1);
+  color: @hs_dim;
+  font-weight: 600;
+}

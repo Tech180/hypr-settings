@@ -1,0 +1,46 @@
+.trial-pill {
+  padding: 12px 20px;
+  border-radius: 999px;
+  background-color: @hs_trial_bg;
+  border: 1px solid alpha(@hs_warning, 0.5);
+  box-shadow: 0 10px 30px alpha(@hs_warning, 0.15);
+  color: @hs_warning;
+}
+
+.trial-pill__message {
+  font-size: 12px;
+  font-weight: 600;
+  color: @hs_warning;
+}
+
+button.trial-pill__btn {
+  min-height: 0;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background-image: none;
+  box-shadow: none;
+  font-weight: 600;
+  transition: background 200ms, opacity 200ms;
+}
+
+button.trial-pill__revert {
+  background: alpha(@hs_bg, 0.5);
+  color: @hs_fg;
+  border: 1px solid @hs_border;
+}
+
+button.trial-pill__revert:hover {
+  background: @hs_bg;
+}
+
+button.trial-pill__keep {
+  background: @hs_warning;
+  color: @hs_on_warning;
+  border: none;
+  font-weight: 700;
+  box-shadow: 0 4px 6px @hs_shadow;
+}
+
+button.trial-pill__keep:hover {
+  opacity: 0.9;
+}

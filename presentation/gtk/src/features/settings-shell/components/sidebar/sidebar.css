@@ -1,0 +1,39 @@
+.sidebar {
+  background: alpha(@hs_bg, 0.5);
+  border-right: 1px solid @hs_border;
+}
+
+.sidebar__list {
+  background: transparent;
+  padding: 4px 12px;
+}
+
+.sidebar__row {
+  padding: 10px 12px;
+  margin: 0 0 4px 0;
+  border-radius: 8px;
+  background: transparent;
+  color: @hs_dim;
+  font-weight: 500;
+  transition: background 200ms, color 200ms;
+}
+
+.sidebar__row:hover {
+  background: @hs_hover;
+  color: @hs_fg;
+}
+
+.sidebar__row:selected,
+.sidebar__row:selected:hover {
+  background: alpha(@hs_accent, 0.15);
+  color: @hs_accent;
+  font-weight: 600;
+  box-shadow: 0 0 20px @hs_accent_glow;
+}
+
+.sidebar__row--disabled,
+.sidebar__row--disabled:hover {
+  background: transparent;
+  color: @hs_dim;
+  opacity: 0.45;
+}

@@ -1,0 +1,117 @@
+flowbox.profile-grid {
+  margin-top: 4px;
+}
+
+flowbox.profile-grid flowboxchild {
+  padding: 0;
+  background: transparent;
+  border-radius: 14px;
+}
+
+flowbox.profile-grid flowboxchild:hover,
+flowbox.profile-grid flowboxchild:selected {
+  background: transparent;
+}
+
+button.action-btn {
+  min-height: 0;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: @hs_accent;
+  font-weight: 600;
+  transition: background 200ms;
+}
+
+button.action-btn:hover:not(:disabled) {
+  background: alpha(@hs_accent, 0.1);
+}
+
+button.action-btn:disabled {
+  opacity: 0.5;
+  background: transparent;
+}
+
+button.profile-card {
+  min-height: 0;
+  padding: 16px;
+  border: 1px solid @hs_border;
+  border-radius: 14px;
+  background: @hs_card;
+  background-image: none;
+  box-shadow: 0 4px 6px @hs_shadow;
+  color: @hs_fg;
+  outline: none;
+  transition: background 200ms, border-color 200ms;
+}
+
+button.profile-card:hover:not(.profile-card--active) {
+  background: @hs_hover;
+  border-color: alpha(@hs_accent, 0.3);
+  background-image: none;
+  box-shadow: 0 4px 6px @hs_shadow;
+}
+
+button.profile-card:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: 0 4px 6px @hs_shadow;
+}
+
+button.profile-card:focus-visible {
+  outline: 2px solid alpha(@hs_accent, 0.45);
+  outline-offset: 2px;
+}
+
+.profile-icon {
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 10px;
+  background: alpha(@hs_fg, 0.04);
+  border: 1px solid @hs_border;
+  color: @hs_dim;
+}
+
+button.profile-card:hover .profile-icon {
+  color: @hs_fg;
+}
+
+.profile-card__badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: alpha(@hs_accent, 0.15);
+  color: @hs_accent;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.profile-card__title {
+  font-size: 14px;
+  font-weight: 700;
+  color: @hs_fg;
+}
+
+.profile-card__subtitle {
+  font-size: 11px;
+  color: @hs_dim;
+}
+
+button.profile-card--active,
+button.profile-card--active:hover {
+  background: alpha(@hs_accent, 0.12);
+  border-color: alpha(@hs_accent, 0.5);
+  box-shadow: inset 0 0 0 1px alpha(@hs_accent, 0.2), 0 4px 6px @hs_shadow;
+}
+
+button.profile-card--active .profile-icon {
+  background: @hs_accent;
+  border: none;
+  color: @hs_bg;
+  box-shadow: 0 0 20px @hs_accent_glow;
+}
+
+button.profile-card--active .profile-card__title {
+  color: @hs_accent;
+}

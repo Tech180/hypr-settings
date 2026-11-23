@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<!-- GTK port: presentation/gtk/src/shared/select/select.css (@hs_* tokens from tokens.css) -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smooth Slide-Down Select</title>
+  <style>
+    /* ==========================================================================
+       CSS Variables & Reset
+       ========================================================================== */
+    :root {
+      --bg-body: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-hover: #f1f5f9;
+      --border-color: #e2e8f0;
+      --border-color-active: #cbd5e1;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --ring-color: rgba(15, 23, 42, 0.05);
+      --radius: 10px;
+      --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding-top: 120px;
+    }
+
+    /* ==========================================================================
+       Select Wrapper & Trigger Box
+       ========================================================================== */
+    .select-wrapper {
+      position: relative;
+      width: 260px;
+      user-select: none;
+    }
+
+    .select-trigger {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background-color: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      font-size: 14px;
+      color: var(--text-main);
+      cursor: pointer;
+      outline: none;
+      position: relative;
+      z-index: 20;
+      transition: border-radius 0.3s var(--transition-timing), 
+                  border-color 0.3s var(--transition-timing),
+                  box-shadow 0.3s var(--transition-timing);
+    }
+
+    .select-trigger:hover {
+      background-color: #fafafa;
+    }
+
+    .select-trigger:focus-visible {
+      box-shadow: 0 0 0 3px var(--ring-color);
+      border-color: var(--border-color-active);
+    }
+
+    .select-value {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 500;
+    }
+
+    .select-value.is-placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .select-icon {
+      width: 16px;
+      height: 16px;
+      color: var(--text-muted);
+      flex-shrink: 0;
+      transition: transform 0.4s var(--transition-timing);
+    }
+
+    /* ==========================================================================
+       Open State Modifications
+       ========================================================================== */
+    /* When open, the trigger's bottom corners straighten out to merge with the dropdown */
+    .select-wrapper.is-open .select-trigger {
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-color: var(--border-color); /* Creates a subtle dividing line */
+      background-color: var(--bg-surface);
+    }
+
+    .select-wrapper.is-open .select-icon {
+      transform: rotate(180deg);
+    }
+
+    /* ==========================================================================
+       Dropdown Container (Handles the Slide-Down Animation)
+       ========================================================================== */
+    .select-dropdown-container {
+      position: absolute;
+      top: calc(100% - 1px); /* Pull up by 1px to overlap the trigger's bottom border exactly */
+      left: 0;
+      width: 100%;
+      /* CSS Grid height transition trick for perfectly smooth auto-height sliding */
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.4s var(--transition-timing);
+      z-index: 10;
+    }
+
+    .select-wrapper.is-open .select-dropdown-container {
+      grid-template-rows: 1fr; /* Expands to natural content height */
+    }
+
+    /* ==========================================================================
+       Dropdown Inner Box
+       ========================================================================== */
+    .select-dropdown {
+      overflow: hidden; /* Crucial for the grid trick to work */
+      min-height: 0;    /* Crucial for the grid trick to work */
+      background-color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px); /* Adds a premium glassy blur matching the React version */
+      -webkit-backdrop-filter: blur(12px);
+      
+      /* Border starts transparent to avoid a visible 1px line when closed */
+      border: 1px solid transparent; 
+      border-top: none;
+      border-radius: 0 0 var(--radius) var(--radius);
+      transition: border-color 0.4s var(--transition-timing),
+                  box-shadow 0.4s var(--transition-timing);
+    }
+
+    /* Show borders and shadow only when open to complete the attached box look */
+    .select-wrapper.is-open .select-dropdown {
+      border-color: var(--border-color);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+    }
+
+    .select-dropdown-inner {
+      padding: 6px;
+    }
+
+    /* ==========================================================================
+       Dropdown Items
+       ========================================================================== */
+    .select-label {
+      padding: 8px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .select-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 32px 8px 10px; /* Right padding makes room for the absolute tick icon */
+      position: relative;
+      font-size: 14px;
+      color: var(--text-main);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .select-item:hover, .select-item:focus {
+      background-color: var(--bg-hover);
+      outline: none;
+    }
+
+    .select-item[aria-selected="true"] {
+      background-color: var(--bg-hover);
+      font-weight: 500;
+    }
+
+    .tick-icon {
+      position: absolute;
+      right: 10px;
+      width: 16px;
+      height: 16px;
+      color: var(--text-main);
+      opacity: 0;
+      transform: scale(0.8);
+      transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .select-item[aria-selected="true"] .tick-icon {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .select-separator {
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 4px -6px; /* Negative margin to span full width ignoring padding */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Select Component -->
+  <div class="select-wrapper" id="fruit-select">
+    
+    <!-- Trigger Box -->
+    <button class="select-trigger" aria-haspopup="listbox" aria-expanded="false" id="fruit-select-trigger">
+      <span class="select-value is-placeholder">Select a fruit</span>
+      <!-- Unfold More Icon -->
+      <svg class="select-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="m7 15 5 5 5-5"/>
+        <path d="m7 9 5-5 5 5"/>
+      </svg>
+    </button>
+
+    <!-- Slide-Down Dropdown -->
+    <div class="select-dropdown-container">
+      <div class="select-dropdown" role="listbox" aria-labelledby="fruit-select-trigger">
+        <div class="select-dropdown-inner">
+          
+          <div class="select-label">Fruits</div>
+          
+          <!-- Select Items -->
+          <div class="select-item" role="option" aria-selected="false" data-value="apple" tabindex="0">
+            Apple
+            <svg class="tick-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          </div>
+
+          <div class="select-item" role="option" aria-selected="false" data-value="banana" tabindex="0">
+            Banana
+            <svg class="tick-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          </div>
+          
+          <div class="select-item" role="option" aria-selected="false" data-value="blueberry" tabindex="0">
+            Blueberry
+            <svg class="tick-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          </div>
+
+          <div class="select-item" role="option" aria-selected="false" data-value="grapes" tabindex="0">
+            Grapes
+            <svg class="tick-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          </div>
+
+          <div class="select-separator"></div>
+
+          <div class="select-item" role="option" aria-selected="false" data-value="pineapple" tabindex="0">
+            Pineapple
+            <svg class="tick-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 6 9 17l-5-5"/>
+            </svg>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const wrapper = document.getElementById('fruit-select');
+      const trigger = document.getElementById('fruit-select-trigger');
+      const triggerValue = trigger.querySelector('.select-value');
+      const items = wrapper.querySelectorAll('.select-item');
+      
+      let isOpen = false;
+
+      // Function to toggle the dropdown state
+      const toggleDropdown = (state) => {
+        isOpen = state !== undefined ? state : !isOpen;
+        
+        if (isOpen) {
+          wrapper.classList.add('is-open');
+          trigger.setAttribute('aria-expanded', 'true');
+        } else {
+          wrapper.classList.remove('is-open');
+          trigger.setAttribute('aria-expanded', 'false');
+        }
+      };
+
+      // Toggle on trigger click
+      trigger.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleDropdown();
+      });
+
+      // Handle item selection
+      items.forEach(item => {
+        // Handle click
+        item.addEventListener('click', () => selectItem(item));
+        
+        // Handle keyboard (Enter / Space) on items
+        item.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            selectItem(item);
+          }
+        });
+      });
+
+      function selectItem(selectedEl) {
+        // Reset all items
+        items.forEach(i => i.setAttribute('aria-selected', 'false'));
+        
+        // Set the active item
+        selectedEl.setAttribute('aria-selected', 'true');
+        
+        // Update trigger text and remove placeholder styling
+        triggerValue.textContent = selectedEl.textContent.trim();
+        triggerValue.classList.remove('is-placeholder');
+        
+        // Close the dropdown
+        toggleDropdown(false);
+        trigger.focus(); // Return focus to the trigger for accessibility
+      }
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!wrapper.contains(e.target) && isOpen) {
+          toggleDropdown(false);
+        }
+      });
+      
+      // Close on Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isOpen) {
+          toggleDropdown(false);
+          trigger.focus();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

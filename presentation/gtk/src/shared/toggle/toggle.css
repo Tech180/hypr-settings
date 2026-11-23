@@ -1,0 +1,27 @@
+switch.toggle-switch {
+  min-width: 44px;
+  min-height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: @hs_border;
+  background-image: none;
+  box-shadow: none;
+  transition: background 300ms;
+}
+
+switch.toggle-switch:checked {
+  background: @hs_accent;
+  box-shadow: 0 0 20px @hs_accent_glow;
+}
+
+switch.toggle-switch slider {
+  min-width: 20px;
+  min-height: 20px;
+  margin: 2px;
+  border: none;
+  border-radius: 50%;
+  background: @hs_fg;
+  background-image: none;
+  box-shadow: 0 2px 4px @hs_shadow;
+}

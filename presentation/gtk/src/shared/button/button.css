@@ -1,0 +1,66 @@
+button.action-btn {
+  min-height: 0;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: @hs_accent;
+  font-weight: 600;
+  transition: background 200ms, border-color 200ms;
+}
+
+button.action-btn:hover:not(:disabled) {
+  background: alpha(@hs_accent, 0.1);
+}
+
+button.action-btn:disabled {
+  opacity: 0.5;
+  background: transparent;
+}
+
+button.action-btn--hollow {
+  border: 1px solid alpha(@hs_accent, 0.4);
+}
+
+button.action-btn--hollow:hover:not(:disabled) {
+  border-color: @hs_accent;
+}
+
+button.action-btn--primary {
+  padding: 12px;
+  border: 1px solid alpha(@hs_accent, 0.3);
+  background: alpha(@hs_accent, 0.15);
+}
+
+button.action-btn--primary:hover:not(:disabled) {
+  background: alpha(@hs_accent, 0.22);
+}
+
+button.action-btn--danger {
+  border: 1px solid alpha(@hs_danger, 0.35);
+  color: @hs_danger;
+}
+
+button.action-btn--danger:hover:not(:disabled) {
+  border-color: @hs_danger;
+  background: alpha(@hs_danger, 0.12);
+}
+
+button.action-btn--compact {
+  padding: 4px 12px;
+  font-size: 11px;
+}
+
+button.action-btn--icon-only {
+  padding: 8px;
+  min-width: 36px;
+  min-height: 36px;
+}
+
+button.action-btn--large {
+  padding: 14px 24px;
+  border-radius: 12px;
+  font-size: 14px;
+}

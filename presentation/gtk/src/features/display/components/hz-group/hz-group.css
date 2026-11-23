@@ -1,0 +1,85 @@
+.hz-group {
+  padding: 22px 20px 20px 20px;
+  background: @hs_card;
+  border: 1px solid @hs_border;
+  border-radius: 14px;
+  box-shadow: 0 4px 6px @hs_shadow;
+}
+
+.hz-header {
+  margin-bottom: 16px;
+}
+
+.hz-title {
+  font-size: 15px;
+  font-weight: 700;
+  padding-top: 2px;
+  color: @hs_fg;
+}
+
+.hz-subtitle {
+  font-size: 11px;
+  color: @hs_dim;
+  margin-top: 2px;
+}
+
+.hz-current {
+  font-size: 28px;
+  font-weight: 800;
+  color: @hs_accent;
+  font-feature-settings: "tnum";
+}
+
+.hz-current-unit {
+  font-size: 14px;
+  color: @hs_dim;
+  font-weight: 600;
+}
+
+flowbox.hz-track flowboxchild,
+flowbox.hz-track flowboxchild:hover,
+flowbox.hz-track flowboxchild:selected {
+  padding: 0;
+  background: transparent;
+  border-radius: 10px;
+}
+
+button.hz-pill {
+  min-height: 0;
+  min-width: 0;
+  padding: 12px 4px;
+  border-radius: 10px;
+  background: @hs_card;
+  border: 1px solid @hs_border;
+  color: @hs_dim;
+  font-weight: 600;
+  font-size: 13px;
+  box-shadow: none;
+  background-image: none;
+}
+
+button.hz-pill:hover:not(.hz-pill--active):not(:disabled) {
+  color: @hs_fg;
+  background: @hs_hover;
+}
+
+button.hz-pill--active {
+  background: @hs_accent;
+  color: @hs_bg;
+  border-color: @hs_accent;
+  box-shadow: 0 4px 12px alpha(@hs_accent, 0.3);
+}
+
+button.hz-pill:disabled {
+  opacity: 0.45;
+  background-image: none;
+}
+
+button.hz-pill--add {
+  border-style: dashed;
+  background: transparent;
+}
+
+button.hz-pill--custom {
+  border-color: alpha(@hs_accent, 0.4);
+}

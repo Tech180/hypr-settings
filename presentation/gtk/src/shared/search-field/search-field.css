@@ -1,0 +1,26 @@
+.search-field {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid @hs_border;
+  border-radius: 8px;
+  background: @hs_card;
+  color: @hs_fg;
+  box-shadow: none;
+  transition: border-color 200ms, box-shadow 200ms;
+}
+
+.search-field:focus-within {
+  border-color: alpha(@hs_accent, 0.5);
+  box-shadow: 0 0 20px @hs_accent_glow;
+}
+
+.search-field text {
+  background: transparent;
+  color: inherit;
+}
+
+.search-field text > placeholder,
+.search-field placeholder {
+  color: @hs_dim;
+  opacity: 1;
+}

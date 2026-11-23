@@ -1,0 +1,40 @@
+.seg-control {
+  padding: 4px;
+  border: 1px solid @hs_border;
+  border-radius: 8px;
+  background: @hs_bg;
+}
+
+flowbox.seg-control flowboxchild {
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  background-image: none;
+  outline: none;
+}
+
+button.seg-btn {
+  min-height: 0;
+  min-width: 0;
+  padding: 6px 16px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: @hs_dim;
+  font-weight: 500;
+  transition: background 200ms, color 200ms;
+}
+
+button.seg-btn:hover {
+  color: @hs_fg;
+  background: transparent;
+}
+
+button.seg-btn--active,
+button.seg-btn--active:hover {
+  background: @hs_accent;
+  color: @hs_bg;
+  box-shadow: 0 1px 3px @hs_shadow;
+}

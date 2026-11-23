@@ -1,0 +1,49 @@
+.hs-pill {
+  padding: 2px 10px;
+  border: 1px solid alpha(@hs_fg, 0.12);
+  border-radius: 999px;
+  background: alpha(@hs_fg, 0.06);
+  color: @hs_dim;
+  font-size: 11px;
+  font-weight: 600;
+  font-feature-settings: "tnum";
+}
+
+.hs-pill--accent {
+  border-color: alpha(@hs_accent, 0.35);
+  background: alpha(@hs_accent, 0.12);
+  color: @hs_accent;
+}
+
+.hs-pill--warning {
+  border-color: alpha(@hs_warning, 0.4);
+  background: alpha(@hs_warning, 0.12);
+  color: @hs_warning;
+}
+
+.hs-pill--danger {
+  border-color: alpha(@hs_danger, 0.4);
+  background: alpha(@hs_danger, 0.12);
+  color: @hs_danger;
+}
+
+.hs-dot {
+  min-width: 8px;
+  min-height: 8px;
+  padding: 0;
+  border-radius: 999px;
+  background: @hs_dim;
+}
+
+.hs-dot--accent {
+  background: @hs_accent;
+  box-shadow: 0 0 8px @hs_accent;
+}
+
+.hs-dot--warning {
+  background: @hs_warning;
+}
+
+.hs-dot--danger {
+  background: @hs_danger;
+}

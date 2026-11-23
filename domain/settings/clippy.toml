@@ -1,0 +1,17 @@
+disallowed-methods = [
+  { path = "std::fs::read", reason = "domain performs no IO; use a driven port" },
+  { path = "std::fs::read_to_string", reason = "domain performs no IO; use a driven port" },
+  { path = "std::fs::write", reason = "domain performs no IO; use a driven port" },
+  { path = "std::fs::create_dir_all", reason = "domain performs no IO; use a driven port" },
+  { path = "std::fs::rename", reason = "domain performs no IO; use a driven port" },
+  { path = "std::fs::remove_file", reason = "domain performs no IO; use a driven port" },
+  { path = "std::process::Command::new", reason = "domain spawns no processes; use a driven port" },
+  { path = "std::time::Instant::now", reason = "time enters through the Clock port" },
+  { path = "std::time::SystemTime::now", reason = "time enters through the Clock port" },
+  { path = "std::thread::sleep", reason = "sleeping goes through the Clock port" },
+  { path = "std::env::var", reason = "environment access belongs to adapters" },
+]
+disallowed-types = [
+  { path = "std::fs::File", reason = "domain performs no IO" },
+  { path = "std::process::Command", reason = "domain spawns no processes" },
+]

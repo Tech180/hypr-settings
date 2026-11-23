@@ -1,0 +1,30 @@
+.tab-bar {
+  border-bottom: 1px solid @hs_border;
+}
+
+button.tab-btn {
+  min-height: 0;
+  min-width: 0;
+  padding: 10px 18px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 8px 8px 0 0;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: @hs_dim;
+  font-weight: 600;
+  transition: background 200ms, color 200ms, border-color 200ms;
+}
+
+button.tab-btn:hover {
+  background: @hs_hover;
+  color: @hs_fg;
+}
+
+button.tab-btn--active,
+button.tab-btn--active:hover {
+  border-bottom-color: @hs_accent;
+  background: alpha(@hs_accent, 0.06);
+  color: @hs_accent;
+}

@@ -1,0 +1,45 @@
+scale.hs-slider {
+  min-height: 28px;
+  min-width: 80px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* The session GTK theme gives `scale > trough > slider` a 32px box with a -15px margin and
+   a bitmap; every property it sets must be overridden here or GTK measures a negative size. */
+scale.hs-slider.horizontal,
+scale.hs-slider.vertical {
+  padding: 0;
+}
+
+scale.hs-slider > trough {
+  min-height: 10px;
+  border-radius: 999px;
+  background: @hs_border;
+}
+
+scale.hs-slider > trough > highlight {
+  min-height: 10px;
+  border-radius: 999px;
+  background-color: @hs_accent;
+  background-image: none;
+}
+
+scale.hs-slider > trough > slider,
+scale.hs-slider.fine-tune > trough > slider {
+  min-width: 14px;
+  min-height: 14px;
+  margin: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: @hs_fg;
+  background-image: none;
+  box-shadow: 0 2px 4px @hs_shadow;
+}
+
+.slider-readout {
+  font-size: 12px;
+  font-weight: 600;
+  color: @hs_dim;
+  font-feature-settings: "tnum";
+}

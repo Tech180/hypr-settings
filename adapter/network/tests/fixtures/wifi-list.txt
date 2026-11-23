@@ -1,0 +1,4 @@
+*:Home\:5G:82:WPA2 WPA3:AA\:BB\:CC\:DD\:EE\:01:5180 MHz:36:540 Mbit/s:Infra:wlan0
+ :Neighbour:41:WPA2:AA\:BB\:CC\:DD\:EE\:02:2437 MHz:6:130 Mbit/s:Infra:wlan0
+ :Cafe:55:--:AA\:BB\:CC\:DD\:EE\:03:2412 MHz:1:65 Mbit/s:Infra:wlan0
+ ::20:--:AA\:BB\:CC\:DD\:EE\:04:2462 MHz:11:54 Mbit/s:Infra:wlan0

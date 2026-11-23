@@ -1,0 +1,41 @@
+.icon-tile {
+  border: 1px solid @hs_border;
+  background: alpha(@hs_fg, 0.04);
+  color: @hs_dim;
+  transition: background 200ms, color 200ms, box-shadow 200ms;
+}
+
+.icon-tile--small {
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 10px;
+}
+
+.icon-tile--large {
+  min-width: 72px;
+  min-height: 72px;
+  border-radius: 22px;
+}
+
+.icon-tile--accent {
+  border-color: transparent;
+  background: @hs_accent;
+  color: @hs_bg;
+  box-shadow: 0 0 20px @hs_accent_glow;
+}
+
+.icon-tile--large.icon-tile--accent {
+  box-shadow: 0 0 32px alpha(@hs_accent, 0.35);
+}
+
+.icon-tile--warning {
+  border-color: alpha(@hs_warning, 0.4);
+  background: alpha(@hs_warning, 0.14);
+  color: @hs_warning;
+}
+
+.icon-tile--danger {
+  border-color: alpha(@hs_danger, 0.4);
+  background: alpha(@hs_danger, 0.14);
+  color: @hs_danger;
+}

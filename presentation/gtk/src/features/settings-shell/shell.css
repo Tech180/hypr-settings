@@ -1,0 +1,23 @@
+window.shell {
+  background: @hs_bg;
+  color: @hs_fg;
+}
+
+.shell__sidebar-header {
+  min-height: 52px;
+  padding: 0 16px;
+  background: @hs_card;
+  border-bottom: 1px solid @hs_border;
+  box-shadow: none;
+}
+
+.shell__title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: @hs_fg;
+}
+
+.shell__content {
+  background: transparent;
+}

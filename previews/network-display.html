@@ -1,0 +1,1606 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>hypr-settings — Network</title>
+    
+    <style>
+      /* Base Variables (Tron Legacy + Layout) */
+      :root {
+        --accent-color: #04bfbf;
+        --accent-bg-color: #04bfbf;
+        --window-bg-color: #0a0a0a;
+        --window-fg-color: #e7f7f7;
+        --view-bg-color: #16222e;
+        --view-fg-color: #e7f7f7;
+        --headerbar-bg-color: #16222e;
+        --headerbar-fg-color: #e7f7f7;
+        --headerbar-border-color: #16222e;
+        --card-bg-color: #16222e;
+        --card-fg-color: #e7f7f7;
+        --card-border-color: #2c313a;
+        --dim-label-color: #9da5b4;
+        --hs-warning: #f5a524;
+        --hs-error: #f87171;
+        --hs-success: #10b981;
+        --shade-color: rgba(0, 0, 0, 0.36);
+        
+        --sidebar-width: 260px;
+        --headerbar-height: 52px;
+        --font-ui: "JetBrainsMono Nerd Font", "JetBrains Mono", ui-monospace, system-ui, sans-serif;
+        
+        /* Effects */
+        --shadow-shell: 0 24px 48px var(--shade-color), 0 0 0 1px var(--card-border-color);
+        --shadow-glow: 0 0 20px rgba(4, 191, 191, 0.15);
+        --shadow-glow-strong: 0 0 12px rgba(4, 191, 191, 0.4);
+      }
+
+      /* Reset & Base Styles */
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        height: 100%;
+        margin: 0;
+        font-family: var(--font-ui);
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        padding: 24px;
+        font: 12px / 1.5 var(--font-ui);
+        color: var(--window-fg-color);
+        background: #050505;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1, h2, h3, p, ul { margin: 0; padding: 0; }
+
+      button {
+        font: inherit;
+        border: none;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+      button:focus-visible, input:focus-visible, select:focus-visible {
+        outline: 2px solid var(--accent-color);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      
+      input[type="text"], input[type="password"] {
+        width: 100%;
+        background: color-mix(in srgb, var(--window-bg-color) 50%, transparent);
+        border: 1px solid var(--card-border-color);
+        color: var(--window-fg-color);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-family: inherit;
+        transition: all 0.2s;
+      }
+      input[type="text"]:focus, input[type="password"]:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 1px var(--accent-color);
+        outline: none;
+      }
+
+      /* Structure */
+      .shell {
+        width: 100%;
+        max-width: 1040px;
+        height: calc(100vh - 48px);
+        max-height: 780px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 16px;
+        background: var(--window-bg-color);
+        box-shadow: var(--shadow-shell);
+      }
+
+      .shell__split {
+        flex: 1;
+        display: flex;
+        min-height: 0;
+      }
+
+      /* Main Sidebar */
+      .shell__sidebar-pane {
+        flex: 0 0 var(--sidebar-width);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        background: var(--window-bg-color);
+        border-right: 1px solid var(--card-border-color);
+        z-index: 10;
+      }
+
+      .headerbar {
+        flex: 0 0 var(--headerbar-height);
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        background: var(--headerbar-bg-color);
+        border-bottom: 1px solid var(--card-border-color);
+      }
+
+      .headerbar__title {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--headerbar-fg-color);
+      }
+
+      .headerbar__controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .headerbar__window-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dim-label-color);
+        transition: background 0.2s, color 0.2s;
+      }
+      .headerbar__window-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--window-fg-color);
+      }
+      .headerbar__window-btn--close:hover {
+        background: rgba(220, 38, 38, 0.9);
+        color: #fff;
+      }
+
+      .sidebar {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        padding-bottom: 8px;
+        background: color-mix(in srgb, var(--window-bg-color) 50%, transparent);
+      }
+
+      .section-search-wrap { padding: 16px; }
+      .section-search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        height: 36px;
+        padding: 0 12px;
+        border: 1px solid var(--card-border-color);
+        border-radius: 8px;
+        background: var(--view-bg-color);
+        color: var(--view-fg-color);
+        transition: all 0.2s;
+      }
+      .section-search:focus-within {
+        border-color: color-mix(in srgb, var(--accent-color) 50%, transparent);
+        box-shadow: var(--shadow-glow);
+      }
+      .section-search__icon { width: 16px; height: 16px; opacity: 0.5; }
+      .section-search input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        outline: none;
+      }
+      .section-search input::placeholder { color: var(--dim-label-color); }
+
+      .sidebar__list {
+        list-style: none;
+        padding: 4px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .sidebar__row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--dim-label-color);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .sidebar__row svg { width: 18px; height: 18px; }
+      .sidebar__row:hover:not(.sidebar__row--selected) {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--window-fg-color);
+      }
+      .sidebar__row--selected {
+        background: color-mix(in srgb, var(--accent-bg-color) 15%, transparent);
+        color: var(--accent-color);
+        font-weight: 600;
+        box-shadow: var(--shadow-glow);
+      }
+
+      /* Content Area */
+      .shell__content-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        background: var(--window-bg-color);
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Network Sub-Views Container */
+      .network-viewport {
+        flex: 1;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .network-slider {
+        display: flex;
+        width: 500%; /* 5 sub-views now (Home + 4) */
+        height: 100%;
+        transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+      }
+
+      .net-view {
+        width: 20%; /* 100 / 5 */
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        position: relative;
+      }
+      
+      .net-view__content {
+        max-width: 800px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        padding: 32px 32px 64px;
+      }
+
+      /* Status Dot */
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent-color);
+        box-shadow: 0 0 8px var(--accent-color);
+        display: inline-block;
+      }
+
+      /* Network Home Dashboard Specifics */
+      .status-hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 32px;
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 16px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .status-hero::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0; height: 2px;
+        background: var(--accent-color);
+        box-shadow: 0 0 12px var(--accent-color);
+      }
+
+      .status-hero__left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .status-hero__icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: color-mix(in srgb, var(--accent-bg-color) 12%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent-color) 30%, transparent);
+        color: var(--accent-color);
+      }
+
+      .status-hero__text {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .status-hero__title {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 4px;
+        color: var(--window-fg-color);
+        letter-spacing: -0.01em;
+      }
+
+      .status-hero__subtitle {
+        font-size: 13px;
+        color: var(--dim-label-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .status-hero__right {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+      }
+
+      .net-metrics {
+        display: flex;
+        gap: 24px;
+      }
+
+      .metric {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .metric__label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--dim-label-color);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .metric__val {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--window-fg-color);
+        font-variant-numeric: tabular-nums;
+      }
+      
+      .boxed-row--nav:hover {
+        background: rgba(255, 255, 255, 0.03);
+        cursor: pointer;
+      }
+      
+      .boxed-row--nav:hover .net-card__chevron {
+        transform: translateX(4px);
+        color: var(--window-fg-color);
+      }
+
+      /* Flyout Properties Subpage */
+      .properties-overlay {
+        position: absolute;
+        inset: 0;
+        background: var(--window-bg-color);
+        z-index: 50;
+        transform: translateX(100%);
+        transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        display: flex;
+        flex-direction: column;
+      }
+
+      .properties-overlay.is-active {
+        transform: translateX(0);
+      }
+
+      /* Reusable Components */
+      .top-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px;
+        background: var(--card-bg-color);
+        padding: 12px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--card-border-color);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+
+      .custom-select {
+        appearance: none;
+        padding: 8px 36px 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--card-border-color);
+        background-color: var(--view-bg-color);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239da5b4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        color: var(--view-fg-color);
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .custom-select:focus { border-color: var(--accent-color); }
+      
+      .search-input {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 200px;
+        height: 36px;
+        padding: 0 12px;
+        background: color-mix(in srgb, var(--window-bg-color) 50%, transparent);
+        border: 1px solid var(--card-border-color);
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+      .search-input:focus-within {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 1px var(--accent-color);
+      }
+      .search-input input {
+        border: none;
+        background: none;
+        padding: 0;
+        color: var(--window-fg-color);
+      }
+      .search-input input:focus { box-shadow: none; }
+
+      /* Expandable Cards (Networks & VPNs) */
+      .card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .net-card {
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 12px;
+        overflow: hidden;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .net-card:hover { border-color: color-mix(in srgb, var(--accent-color) 40%, transparent); }
+      
+      .net-card--active {
+        border-color: var(--accent-color);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-color) 20%, transparent);
+      }
+      
+      .net-card__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .net-card__info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+      }
+
+      .net-card__icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        background: var(--view-bg-color);
+        border: 1px solid var(--card-border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dim-label-color);
+      }
+      
+      .net-card--active .net-card__icon {
+        background: var(--accent-color);
+        border-color: var(--accent-color);
+        color: var(--window-bg-color);
+        box-shadow: 0 4px 12px rgba(4, 191, 191, 0.3);
+      }
+
+      .net-card__text { flex: 1; }
+      .net-card__title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--window-fg-color);
+        margin-bottom: 2px;
+      }
+      .net-card--active .net-card__title { color: var(--accent-color); }
+      
+      .net-card__subtitle {
+        font-size: 12px;
+        color: var(--dim-label-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .net-card__meta {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        color: var(--dim-label-color);
+      }
+
+      .net-card__chevron {
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        color: var(--dim-label-color);
+      }
+
+      .net-card__details {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        background: color-mix(in srgb, var(--window-bg-color) 30%, transparent);
+        border-top: 1px solid transparent;
+      }
+
+      .net-card.is-expanded .net-card__details {
+        max-height: 500px;
+        border-top-color: color-mix(in srgb, var(--card-border-color) 50%, transparent);
+      }
+      .net-card.is-expanded .net-card__chevron { transform: rotate(180deg); }
+
+      .details-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 20px;
+        padding: 20px;
+      }
+      .detail-item__label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--dim-label-color);
+        margin-bottom: 4px;
+      }
+      .detail-item__value {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--window-fg-color);
+      }
+      .details-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 12px;
+        padding: 0 20px 20px;
+      }
+
+      /* Bento Blocks */
+      .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+        align-items: start;
+      }
+      .bento-col {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .boxed-group {
+        display: flex;
+        flex-direction: column;
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .boxed-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid color-mix(in srgb, var(--card-border-color) 50%, transparent);
+        min-height: 64px;
+        gap: 16px;
+      }
+      .boxed-row:last-child { border-bottom: none; }
+      .boxed-row__text { flex: 1; min-width: 0; }
+      .boxed-row__title { font-size: 13px; font-weight: 600; }
+      .boxed-row__subtitle { font-size: 11px; color: var(--dim-label-color); margin-top: 4px; }
+
+      /* Toggles & Elements */
+      .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        border-radius: 999px;
+        background: var(--card-border-color);
+        cursor: pointer;
+        transition: background 0.3s;
+        flex-shrink: 0;
+      }
+      .toggle-switch--on { background: var(--accent-bg-color); box-shadow: var(--shadow-glow); }
+      .toggle-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--window-fg-color);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        pointer-events: none;
+      }
+      .toggle-switch--on .toggle-thumb { transform: translateX(20px); }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: 6px;
+        background: color-mix(in srgb, var(--dim-label-color) 15%, transparent);
+        color: var(--dim-label-color);
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .badge--active {
+        background: color-mix(in srgb, var(--accent-color) 15%, transparent);
+        color: var(--accent-color);
+        border: 1px solid color-mix(in srgb, var(--accent-color) 30%, transparent);
+      }
+      
+      .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 12px;
+        transition: all 0.2s;
+      }
+      .action-btn--primary {
+        background: var(--accent-color);
+        color: var(--window-bg-color);
+      }
+      .action-btn--primary:hover { opacity: 0.9; }
+      .action-btn--hollow {
+        border: 1px solid var(--card-border-color);
+        background: var(--view-bg-color);
+      }
+      .action-btn--hollow:hover { background: rgba(255, 255, 255, 0.05); }
+      .action-btn--danger {
+        background: color-mix(in srgb, var(--hs-error) 10%, transparent);
+        color: var(--hs-error);
+      }
+      
+      /* Section Headers */
+      .section-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .section-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--window-fg-color);
+      }
+      
+      .spinner {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        border: 2px solid color-mix(in srgb, var(--dim-label-color) 30%, transparent);
+        border-top-color: var(--dim-label-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      /* Diagnostics Terminal */
+      .terminal {
+        background: #050505;
+        border: 1px solid var(--card-border-color);
+        border-radius: 12px;
+        padding: 16px;
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+        font-size: 11px;
+        line-height: 1.6;
+        height: 500px;
+        overflow-y: auto;
+        color: var(--dim-label-color);
+        box-shadow: inset 0 4px 20px rgba(0,0,0,0.5);
+      }
+      .term-time { color: #6b7280; margin-right: 12px; }
+      .term-src { color: var(--accent-color); margin-right: 12px; }
+      .term-warn { color: var(--hs-warning); }
+      .term-err { color: var(--hs-error); }
+      .term-ok { color: var(--hs-success); }
+      
+      /* Modals */
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 100;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+      .modal-overlay.is-visible {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .modal {
+        background: var(--window-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 16px;
+        padding: 32px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+        transform: translateY(20px);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .modal-overlay.is-visible .modal { transform: translateY(0); }
+      
+      .modal-header {
+        margin-bottom: 24px;
+        text-align: center;
+      }
+      .modal-header h3 { font-size: 18px; margin: 0 0 8px; }
+      .modal-header p { font-size: 13px; color: var(--dim-label-color); margin: 0; }
+      
+      .form-group { margin-bottom: 16px; }
+      .form-group label { display: block; font-size: 11px; color: var(--dim-label-color); margin-bottom: 6px; }
+      
+      .modal-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 32px;
+      }
+      .modal-actions button { flex: 1; }
+
+      .qr-placeholder {
+        width: 200px; height: 200px; background: #fff; margin: 24px auto; border-radius: 8px; padding: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell" role="application" aria-label="Settings">
+      <div class="shell__split">
+        
+        <!-- MAIN SIDEBAR -->
+        <div class="shell__sidebar-pane">
+          <header class="headerbar">
+            <h1 class="headerbar__title">Settings</h1>
+            <div class="headerbar__controls">
+              <button type="button" class="headerbar__window-btn" aria-label="Menu">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+              </button>
+            </div>
+          </header>
+          
+          <div class="sidebar">
+            <div class="section-search-wrap">
+              <label class="section-search">
+                <svg class="section-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <input type="search" placeholder="Search settings..." />
+              </label>
+            </div>
+            
+            <div class="sidebar__scroller">
+              <ul class="sidebar__list">
+                <li class="sidebar__row">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                  Display
+                </li>
+                <li class="sidebar__row">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11L12 23V1l5.5 5.5-11 11"></path></svg>
+                  Bluetooth
+                </li>
+                <li class="sidebar__row sidebar__row--selected">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  Network
+                </li>
+                <li class="sidebar__row">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
+                  Performance
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT PANE -->
+        <div class="shell__content-pane">
+          
+          <header class="headerbar">
+            <h1 class="headerbar__title" style="font-size: 15px;" id="main-view-title">Network & Internet</h1>
+            <div class="headerbar__controls">
+              <button type="button" class="headerbar__window-btn headerbar__window-btn--close" aria-label="Close">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+          </header>
+
+          <div class="network-viewport">
+            <div class="network-slider" id="network-slider">
+              
+              <!-- 0. NETWORK HOME DASHBOARD -->
+              <div class="net-view">
+                <div class="net-view__content">
+                  
+                  <div class="status-hero">
+                    <div class="status-hero__left">
+                      <div class="status-hero__icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                      </div>
+                      <div class="status-hero__text">
+                        <h2 class="status-hero__title">Stark Industries Guest</h2>
+                        <div class="status-hero__subtitle">
+                          <span class="status-dot"></span> Connected to Internet
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="status-hero__right">
+                      <div class="net-metrics">
+                        <div class="metric">
+                          <div class="metric__label"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="19" x2="12" y2="5"></line><polyline points="5 12 12 5 19 12"></polyline></svg> Tx</div>
+                          <div class="metric__val">1.2 MB/s</div>
+                        </div>
+                        <div class="metric">
+                          <div class="metric__label"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><polyline points="19 12 12 19 5 12"></polyline></svg> Rx</div>
+                          <div class="metric__val">14.8 MB/s</div>
+                        </div>
+                      </div>
+                      <div style="width: 1px; height: 32px; background: var(--card-border-color);"></div>
+                      <button class="action-btn action-btn--hollow" onclick="openProperties()">Properties</button>
+                    </div>
+                  </div>
+
+                  <section>
+                    <div class="section-header">
+                      <h2 class="section-title">Network Connections</h2>
+                    </div>
+                    <div class="boxed-group">
+                      
+                      <!-- Wi-Fi Row -->
+                      <div class="boxed-row boxed-row--nav" onclick="goToView(1, 'Wi-Fi')">
+                        <div class="net-card__icon" style="background: transparent; border: none; font-size: 20px; color: var(--window-fg-color);">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                        </div>
+                        <div class="boxed-row__text" style="padding-left: 8px;">
+                          <p class="boxed-row__title">Wi-Fi</p>
+                          <p class="boxed-row__subtitle" style="color: var(--accent-color);">Stark Industries Guest</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                          <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true" onclick="event.stopPropagation(); toggleSwitch(this)">
+                            <span class="toggle-thumb"></span>
+                          </div>
+                          <svg class="net-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                      </div>
+
+                      <!-- Ethernet Row -->
+                      <div class="boxed-row boxed-row--nav" onclick="goToView(2, 'Ethernet')">
+                        <div class="net-card__icon" style="background: transparent; border: none; font-size: 20px; color: var(--window-fg-color);">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="12" rx="2" ry="2"></rect><path d="M12 16v6"></path><path d="M8 22h8"></path><path d="M12 9h.01"></path></svg>
+                        </div>
+                        <div class="boxed-row__text" style="padding-left: 8px;">
+                          <p class="boxed-row__title">Ethernet</p>
+                          <p class="boxed-row__subtitle">Not connected</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                          <svg class="net-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                      </div>
+
+                      <!-- VPN Row -->
+                      <div class="boxed-row boxed-row--nav" onclick="goToView(3, 'VPN')">
+                        <div class="net-card__icon" style="background: transparent; border: none; font-size: 20px; color: var(--window-fg-color);">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        </div>
+                        <div class="boxed-row__text" style="padding-left: 8px;">
+                          <p class="boxed-row__title">VPN</p>
+                          <p class="boxed-row__subtitle">1 Active Tunnel</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                          <svg class="net-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                      </div>
+
+                    </div>
+                  </section>
+
+                  <section>
+                    <div class="section-header">
+                      <h2 class="section-title">Advanced</h2>
+                    </div>
+                    <div class="boxed-group">
+                      <!-- Diagnostics Row -->
+                      <div class="boxed-row boxed-row--nav" onclick="goToView(4, 'Diagnostics')">
+                        <div class="net-card__icon" style="background: transparent; border: none; font-size: 20px; color: var(--window-fg-color);">
+                          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+                        </div>
+                        <div class="boxed-row__text" style="padding-left: 8px;">
+                          <p class="boxed-row__title">Diagnostics & Logs</p>
+                          <p class="boxed-row__subtitle">NetworkManager tracing and status</p>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 16px;">
+                          <svg class="net-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                </div>
+              </div>
+
+              <!-- 1. WI-FI TAB -->
+              <div class="net-view">
+                <header class="headerbar headerbar--transparent" style="position: sticky; top: 0; background: var(--window-bg-color); z-index: 20; border-bottom: 1px solid var(--card-border-color);">
+                  <div class="headerbar__controls" style="flex: 1;">
+                    <button class="headerbar__window-btn" onclick="goToView(0, 'Network & Internet')" type="button" style="width: auto; padding: 0 12px; gap: 8px; justify-content: flex-start; color: var(--window-fg-color);">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      Back
+                    </button>
+                  </div>
+                  <div class="headerbar__title" style="flex: 2; text-align: center;">Wi-Fi</div>
+                  <div class="headerbar__controls" style="flex: 1;"></div>
+                </header>
+                <div class="net-view__content" style="padding-top: 24px;">
+                  
+                  <div class="top-toolbar">
+                    <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true" onclick="toggleSwitch(this)">
+                      <span class="toggle-thumb"></span>
+                    </div>
+                    
+                    <select class="custom-select" style="min-width: 220px;">
+                      <option selected>wlan0 (Intel AX210)</option>
+                      <option>wlan1 (Realtek USB)</option>
+                    </select>
+
+                    <div class="search-input">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                      <input type="text" placeholder="Search Networks..." />
+                    </div>
+                  </div>
+
+                  <!-- Active Network -->
+                  <section>
+                    <div class="section-header">
+                      <h2 class="section-title">Active Connection</h2>
+                    </div>
+                    
+                    <div class="card-list">
+                      <div class="net-card net-card--active is-expanded">
+                        <div class="net-card__header" onclick="toggleExpand(this)">
+                          <div class="net-card__info">
+                            <div class="net-card__icon">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M1.42 9a16 16 0 0 1 21.16 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                            </div>
+                            <div class="net-card__text">
+                              <div class="net-card__title">Stark Industries Guest</div>
+                              <div class="net-card__subtitle">
+                                Connected, secured
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="net-card__meta">
+                            <button class="action-btn action-btn--hollow" onclick="event.stopPropagation(); disconnectMock(this)">Disconnect</button>
+                            <svg class="net-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                          </div>
+                        </div>
+                        
+                        <div class="net-card__details">
+                          <div class="details-grid">
+                            <div>
+                              <div class="detail-item__label">Security</div>
+                              <div class="detail-item__value">WPA3-Personal</div>
+                            </div>
+                            <div>
+                              <div class="detail-item__label">Band</div>
+                              <div class="detail-item__value">5 GHz (802.11ax)</div>
+                            </div>
+                            <div>
+                              <div class="detail-item__label">Channel</div>
+                              <div class="detail-item__value">36 (5180 MHz)</div>
+                            </div>
+                            <div>
+                              <div class="detail-item__label">BSSID</div>
+                              <div class="detail-item__value" style="font-family: monospace;">A1:B2:C3:D4:E5:F6</div>
+                            </div>
+                            <div>
+                              <div class="detail-item__label">Link Rate</div>
+                              <div class="detail-item__value">1201 Mbps (Rx/Tx)</div>
+                            </div>
+                            <div>
+                              <div class="detail-item__label">Device</div>
+                              <div class="detail-item__value">wlan0</div>
+                            </div>
+                          </div>
+                          <div class="details-actions">
+                            <button class="action-btn action-btn--hollow" onclick="openProperties()">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                              Connection Properties
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- Available Networks -->
+                  <section>
+                    <div class="section-header">
+                      <div style="display: flex; align-items: center;">
+                        <h2 class="section-title">Available Networks</h2>
+                        <span class="spinner"></span>
+                      </div>
+                      <div style="display: flex; gap: 8px;">
+                        <select class="custom-select" style="padding: 6px 32px 6px 12px; font-size: 11px; min-width: 140px;">
+                          <option>Scan: Manual Only</option>
+                          <option selected>Scan: 60s Periodic</option>
+                          <option>Scan: 2m Periodic</option>
+                        </select>
+                        <button class="action-btn action-btn--hollow" style="padding: 6px 10px;" title="Force Scan">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                        </button>
+                      </div>
+                    </div>
+
+                    <div class="card-list">
+                      <!-- Network 1 -->
+                      <div class="net-card">
+                        <div class="net-card__header" onclick="toggleExpand(this)">
+                          <div class="net-card__info">
+                            <div class="net-card__icon" style="background: transparent; border: 1px solid var(--card-border-color);">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                            </div>
+                            <div class="net-card__text">
+                              <div class="net-card__title">Starbucks_WiFi</div>
+                              <div class="net-card__subtitle">Open Network • Weak Signal</div>
+                            </div>
+                          </div>
+                          <div class="net-card__meta">
+                            <svg class="net-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                          </div>
+                        </div>
+                        <div class="net-card__details">
+                          <div class="details-grid">
+                            <div>
+                              <div class="detail-item__label">Security</div>
+                              <div class="detail-item__value">None (Open)</div>
+                            </div>
+                            <div>
+                              <div class="detail-item__label">Band</div>
+                              <div class="detail-item__value">2.4 GHz (802.11n)</div>
+                            </div>
+                          </div>
+                          <div class="details-actions">
+                            <button class="action-btn action-btn--primary">Connect</button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Network 2 -->
+                      <div class="net-card">
+                        <div class="net-card__header" onclick="toggleExpand(this)">
+                          <div class="net-card__info">
+                            <div class="net-card__icon" style="background: transparent; border: 1px solid var(--card-border-color);">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12.55a11 11 0 0 1 14.08 0"></path><path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path><line x1="12" y1="20" x2="12.01" y2="20"></line></svg>
+                            </div>
+                            <div class="net-card__text">
+                              <div class="net-card__title">Wayne Manor 5G</div>
+                              <div class="net-card__subtitle">
+                                Secured
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="net-card__meta">
+                            <svg class="net-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                          </div>
+                        </div>
+                        <div class="net-card__details">
+                          <div class="details-grid" style="padding-bottom: 0;">
+                            <div>
+                              <div class="detail-item__label">Security</div>
+                              <div class="detail-item__value">WPA2/WPA3</div>
+                            </div>
+                            <div>
+                              <div class="detail-item__label">Band</div>
+                              <div class="detail-item__value">5 GHz (802.11ac)</div>
+                            </div>
+                          </div>
+                          <div class="details-actions" style="padding: 20px;">
+                            <input type="password" placeholder="Enter network password..." style="max-width: 280px; height: 36px; margin-right: auto;" />
+                            <button class="action-btn action-btn--primary">Connect</button>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </section>
+                </div>
+              </div>
+
+              <!-- 2. ETHERNET TAB -->
+              <div class="net-view">
+                <header class="headerbar headerbar--transparent" style="position: sticky; top: 0; background: var(--window-bg-color); z-index: 20; border-bottom: 1px solid var(--card-border-color);">
+                  <div class="headerbar__controls" style="flex: 1;">
+                    <button class="headerbar__window-btn" onclick="goToView(0, 'Network & Internet')" type="button" style="width: auto; padding: 0 12px; gap: 8px; justify-content: flex-start; color: var(--window-fg-color);">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      Back
+                    </button>
+                  </div>
+                  <div class="headerbar__title" style="flex: 2; text-align: center;">Ethernet</div>
+                  <div class="headerbar__controls" style="flex: 1;"></div>
+                </header>
+                <div class="net-view__content" style="padding-top: 24px;">
+                  <div class="top-toolbar">
+                    <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true" onclick="toggleSwitch(this)">
+                      <span class="toggle-thumb"></span>
+                    </div>
+                    <select class="custom-select" style="flex: 1;">
+                      <option selected>enp3s0 (Realtek RTL8111/8168/8411)</option>
+                      <option>enp4s0 (Intel I211 Gigabit Network)</option>
+                    </select>
+                  </div>
+
+                  <div class="bento-grid" style="margin-top: 8px;">
+                    <!-- Status Card -->
+                    <div class="boxed-group">
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title" style="color: var(--accent-color); font-size: 18px;">Connected</p>
+                          <p class="boxed-row__subtitle">IPv4 Internet Access Active</p>
+                        </div>
+                        <div style="text-align: right;">
+                          <p style="font-size: 28px; font-weight: 800; color: var(--window-fg-color); margin: 0; line-height: 1;">1000</p>
+                          <p style="font-size: 11px; color: var(--dim-label-color); margin: 0; font-weight: 600;">Mbps (Full Duplex)</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- IPv4 Configuration -->
+                    <div class="boxed-group">
+                      <div class="boxed-row" style="background: rgba(255,255,255,0.02);">
+                        <p class="boxed-row__title">IPv4 Configuration (DHCP)</p>
+                        <button class="action-btn action-btn--hollow" style="padding: 4px 12px; font-size: 11px;">Edit</button>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">IP Address</p>
+                          <p class="boxed-row__subtitle" style="font-family: monospace;">192.168.1.142 / 24</p>
+                        </div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Gateway</p>
+                          <p class="boxed-row__subtitle" style="font-family: monospace;">192.168.1.1</p>
+                        </div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">DNS Servers</p>
+                          <p class="boxed-row__subtitle" style="font-family: monospace;">1.1.1.1, 1.0.0.1</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Hardware Telemetry -->
+                    <div class="boxed-group">
+                      <div class="boxed-row" style="background: rgba(255,255,255,0.02);">
+                        <p class="boxed-row__title">Hardware Telemetry</p>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">MAC Address</p>
+                          <p class="boxed-row__subtitle" style="font-family: monospace; text-transform: uppercase;">00:1A:2B:3C:4D:5E</p>
+                        </div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">MTU</p>
+                          <p class="boxed-row__subtitle">1500 bytes</p>
+                        </div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Data Transferred</p>
+                          <p class="boxed-row__subtitle">Rx: 4.2 GB • Tx: 890 MB</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. VPN TAB -->
+              <div class="net-view">
+                <header class="headerbar headerbar--transparent" style="position: sticky; top: 0; background: var(--window-bg-color); z-index: 20; border-bottom: 1px solid var(--card-border-color);">
+                  <div class="headerbar__controls" style="flex: 1;">
+                    <button class="headerbar__window-btn" onclick="goToView(0, 'Network & Internet')" type="button" style="width: auto; padding: 0 12px; gap: 8px; justify-content: flex-start; color: var(--window-fg-color);">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      Back
+                    </button>
+                  </div>
+                  <div class="headerbar__title" style="flex: 2; text-align: center;">VPN</div>
+                  <div class="headerbar__controls" style="flex: 1;"></div>
+                </header>
+                <div class="net-view__content" style="padding-top: 24px;">
+                  <div class="top-toolbar" style="justify-content: space-between;">
+                    <div style="font-weight: 600; color: var(--dim-label-color);">1 Active Tunnel</div>
+                    <div style="display: flex; gap: 12px;">
+                      <button class="action-btn action-btn--hollow" onclick="showModal('import-modal')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        Import .conf
+                      </button>
+                      <button class="action-btn action-btn--primary" onclick="showModal('wg-modal')">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Add WireGuard
+                      </button>
+                    </div>
+                  </div>
+
+                  <section>
+                    <div class="section-header"><h2 class="section-title">Active Tunnels</h2></div>
+                    <div class="card-list">
+                      <div class="net-card net-card--active is-expanded">
+                        <div class="net-card__header" onclick="toggleExpand(this)">
+                          <div class="net-card__info">
+                            <div class="net-card__icon">
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            </div>
+                            <div class="net-card__text">
+                              <div class="net-card__title">Mullvad-US</div>
+                              <div class="net-card__subtitle">WireGuard • wg-quick</div>
+                            </div>
+                          </div>
+                          <div class="net-card__meta">
+                            <span class="badge badge--active">Systemd</span>
+                            <button class="action-btn action-btn--hollow" onclick="event.stopPropagation()">Disconnect</button>
+                            <svg class="net-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                          </div>
+                        </div>
+                        <div class="net-card__details">
+                          <div class="details-grid">
+                            <div><div class="detail-item__label">Interface</div><div class="detail-item__value">wg0</div></div>
+                            <div><div class="detail-item__label">IPv4</div><div class="detail-item__value" style="font-family: monospace;">10.64.12.1</div></div>
+                            <div><div class="detail-item__label">Endpoint</div><div class="detail-item__value" style="font-family: monospace;">198.51.100.1:51820</div></div>
+                            <div><div class="detail-item__label">Allowed IPs</div><div class="detail-item__value" style="font-family: monospace;">0.0.0.0/0, ::/0</div></div>
+                            <div>
+                              <div class="detail-item__label">Peer Key</div>
+                              <div class="detail-item__value" style="font-family: monospace; display: flex; align-items: center; gap: 8px;">
+                                q7V2...x9E= 
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <div class="section-header"><h2 class="section-title">Configured Tunnels</h2></div>
+                    <div class="card-list">
+                      <div class="net-card">
+                        <div class="net-card__header" onclick="toggleExpand(this)">
+                          <div class="net-card__info">
+                            <div class="net-card__icon" style="background: transparent; border: 1px solid var(--card-border-color);">
+                              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            </div>
+                            <div class="net-card__text">
+                              <div class="net-card__title">Corporate Intranet</div>
+                              <div class="net-card__subtitle">OpenVPN • NetworkManager</div>
+                            </div>
+                          </div>
+                          <div class="net-card__meta">
+                            <button class="action-btn action-btn--primary" onclick="event.stopPropagation()">Connect</button>
+                            <svg class="net-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                          </div>
+                        </div>
+                        <div class="net-card__details">
+                          <div class="details-grid">
+                            <div><div class="detail-item__label">Method</div><div class="detail-item__value">Password & Cert</div></div>
+                            <div><div class="detail-item__label">Gateway</div><div class="detail-item__value" style="font-family: monospace;">vpn.example.com</div></div>
+                          </div>
+                          <div class="details-actions">
+                            <button class="action-btn action-btn--danger">Delete</button>
+                            <button class="action-btn action-btn--hollow">Edit</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+              </div>
+
+              <!-- 4. DIAGNOSTICS TAB -->
+              <div class="net-view">
+                <header class="headerbar headerbar--transparent" style="position: sticky; top: 0; background: var(--window-bg-color); z-index: 20; border-bottom: 1px solid var(--card-border-color);">
+                  <div class="headerbar__controls" style="flex: 1;">
+                    <button class="headerbar__window-btn" onclick="goToView(0, 'Network & Internet')" type="button" style="width: auto; padding: 0 12px; gap: 8px; justify-content: flex-start; color: var(--window-fg-color);">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                      Back
+                    </button>
+                  </div>
+                  <div class="headerbar__title" style="flex: 2; text-align: center;">Diagnostics</div>
+                  <div class="headerbar__controls" style="flex: 1;"></div>
+                </header>
+                <div class="net-view__content" style="padding-top: 24px;">
+                  <div class="section-header">
+                    <h2 class="section-title">NetworkManager Logs & Trace</h2>
+                    <button class="action-btn action-btn--hollow" style="font-size: 11px; padding: 4px 12px;">Clear Log</button>
+                  </div>
+                  
+                  <div class="terminal">
+                    <div class="term-line"><span class="term-time">[14:32:01.102]</span> <span class="term-src">NetworkManager</span> <span class="term-ok">&lt;info&gt;</span>  [1714588321.1025] device (wlan0): set-hw-addr: set MAC address to E4:12:F8:9B:00:1A</div>
+                    <div class="term-line"><span class="term-time">[14:32:01.105]</span> <span class="term-src">hypr-settings</span>  <span class="term-ok">&lt;trace&gt;</span> Triggered periodic scan (60s policy).</div>
+                    <div class="term-line"><span class="term-time">[14:32:03.450]</span> <span class="term-src">NetworkManager</span> <span class="term-ok">&lt;info&gt;</span>  [1714588323.4501] device (wlan0): supplicant interface state: scanning -&gt; inactive</div>
+                    <div class="term-line"><span class="term-time">[14:32:05.922]</span> <span class="term-src">NetworkManager</span> <span class="term-ok">&lt;info&gt;</span>  [1714588325.9223] device (wlan0): state change: disconnected -&gt; prepare</div>
+                    <div class="term-line"><span class="term-time">[14:32:05.924]</span> <span class="term-src">NetworkManager</span> <span class="term-ok">&lt;info&gt;</span>  [1714588325.9240] manager: NetworkManager state is now CONNECTING</div>
+                    <div class="term-line"><span class="term-time">[14:32:06.012]</span> <span class="term-src">NetworkManager</span> <span class="term-warn">&lt;warn&gt;</span>  [1714588326.0121] sup-iface[0x55df2a1b]: connection disconnected (reason -3)</div>
+                    <div class="term-line"><span class="term-time">[14:32:07.123]</span> <span class="term-src">NetworkManager</span> <span class="term-ok">&lt;info&gt;</span>  [1714588327.1235] device (wlan0): state change: config -&gt; ip-config</div>
+                    <div class="term-line"><span class="term-time">[14:32:07.150]</span> <span class="term-src">NetworkManager</span> <span class="term-ok">&lt;info&gt;</span>  [1714588327.1502] dhcp4 (wlan0): activation: beginning transaction (timeout in 45 seconds)</div>
+                    <div class="term-line"><span class="term-time">[14:32:07.189]</span> <span class="term-src">NetworkManager</span> <span class="term-ok">&lt;info&gt;</span>  [1714588327.1898] dhcp4 (wlan0): state changed new lease, address=192.168.0.104</div>
+                    <div class="term-line"><span class="term-time">[14:32:07.200]</span> <span class="term-src">hypr-settings</span>  <span class="term-ok">&lt;trace&gt;</span> Connectivity check passed. Full internet access.</div>
+                    <br/>
+                    <div style="color: #6b7280; font-style: italic;">[ NetworkManager Logs Live Tailing... ]</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- FLYOUT: CONNECTION PROPERTIES -->
+            <div class="properties-overlay" id="properties-overlay">
+              <header class="headerbar" style="background: transparent;">
+                <div class="headerbar__controls">
+                  <button class="headerbar__window-btn" onclick="closeProperties()" style="width: auto; padding: 0 12px; gap: 8px; color: var(--window-fg-color);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back
+                  </button>
+                </div>
+                <div class="headerbar__title" style="text-align: center;">Connection Properties</div>
+                <div class="headerbar__controls" style="width: 70px;"></div>
+              </header>
+
+              <div class="page-content" style="flex: 1; overflow-y: auto;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+                  <div>
+                    <h1 style="font-size: 24px; font-weight: 800; margin: 0;">Stark Industries Guest</h1>
+                    <p style="color: var(--accent-color); font-weight: 600; font-size: 13px; margin: 4px 0 0;">Active Wi-Fi Profile</p>
+                  </div>
+                  <div style="display: flex; gap: 12px;">
+                    <button class="action-btn action-btn--primary" onclick="showModal('qr-modal')">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+                      Share
+                    </button>
+                    <button class="action-btn action-btn--danger" onclick="closeProperties()">Forget</button>
+                  </div>
+                </div>
+
+                <div class="bento-grid">
+                  <div class="bento-col">
+                    <div class="boxed-group">
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Auto-Join</p>
+                          <p class="boxed-row__subtitle">Connect automatically</p>
+                        </div>
+                        <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true" onclick="toggleSwitch(this)"><span class="toggle-thumb"></span></div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Metered Connection</p>
+                          <p class="boxed-row__subtitle">Restrict background data</p>
+                        </div>
+                        <div class="toggle-switch" role="switch" aria-checked="false" onclick="toggleSwitch(this)"><span class="toggle-thumb"></span></div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">MAC Randomization</p>
+                          <p class="boxed-row__subtitle">Enhance privacy</p>
+                        </div>
+                        <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true" onclick="toggleSwitch(this)"><span class="toggle-thumb"></span></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="bento-col">
+                    <div class="boxed-group">
+                      <div class="boxed-row" style="background: rgba(255,255,255,0.02);">
+                        <p class="boxed-row__title">IP Settings</p>
+                        <div class="seg-control">
+                          <button class="seg-btn seg-btn--active">IPv4</button>
+                          <button class="seg-btn">IPv6</button>
+                        </div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text"><p class="boxed-row__title">Method</p></div>
+                        <select class="custom-select">
+                          <option selected>Automatic (DHCP)</option>
+                          <option>Manual</option>
+                        </select>
+                      </div>
+                      <div class="boxed-row" style="flex-direction: column; align-items: stretch;">
+                        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                          <div style="flex: 2;">
+                            <label style="font-size: 11px; color: var(--dim-label-color); display: block; margin-bottom: 4px;">IP Address</label>
+                            <input type="text" value="192.168.0.104" />
+                          </div>
+                          <div style="flex: 1;">
+                            <label style="font-size: 11px; color: var(--dim-label-color); display: block; margin-bottom: 4px;">Prefix</label>
+                            <input type="text" value="24" />
+                          </div>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                          <label style="font-size: 11px; color: var(--dim-label-color); display: block; margin-bottom: 4px;">Gateway</label>
+                          <input type="text" value="192.168.0.1" />
+                        </div>
+                        <div>
+                          <label style="font-size: 11px; color: var(--dim-label-color); display: block; margin-bottom: 4px;">DNS (Comma separated)</label>
+                          <input type="text" value="1.1.1.1, 1.0.0.1" />
+                        </div>
+                      </div>
+                      <div class="boxed-row" style="background: rgba(255,255,255,0.02); justify-content: flex-end;">
+                         <button class="action-btn action-btn--primary">Apply</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-overlay" id="qr-modal" onclick="hideModal('qr-modal')">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Share Network</h3>
+          <p>Scan to connect to "Stark Industries Guest"</p>
+        </div>
+        <div class="qr-placeholder">
+          <svg viewBox="0 0 100 100" width="100%" height="100%">
+            <rect width="100" height="100" fill="#fff" />
+            <path d="M10,10 h20 v20 h-20 z M15,15 h10 v10 h-10 z M70,10 h20 v20 h-20 z M75,15 h10 v10 h-10 z M10,70 h20 v20 h-20 z M15,75 h10 v10 h-10 z" fill="#000" />
+            <path d="M40,10 h20 v5 h-20 z M45,20 h10 v10 h-10 z M10,40 h15 v15 h-15 z M30,45 h20 v10 h-20 z M60,40 h10 v20 h-10 z M80,40 h10 v10 h-10 z M85,60 h5 v30 h-5 z M40,70 h30 v10 h-30 z M45,85 h15 v5 h-15 z M70,75 h10 v15 h-10 z" fill="#000" />
+          </svg>
+        </div>
+        <button class="action-btn action-btn--primary" style="width: 100%;" onclick="hideModal('qr-modal')">Done</button>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="import-modal" onclick="hideModal('import-modal')">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Import VPN</h3>
+          <p>Provide an absolute path to a .conf or .ovpn file.</p>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label>File Path</label>
+          <input type="text" placeholder="/home/user/Downloads/wg0.conf" />
+        </div>
+        <div class="modal-actions">
+          <button class="action-btn action-btn--hollow" onclick="hideModal('import-modal')">Cancel</button>
+          <button class="action-btn action-btn--primary" onclick="hideModal('import-modal')">Import</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="wg-modal" onclick="hideModal('wg-modal')">
+      <div class="modal" onclick="event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Add WireGuard</h3>
+          <p>Configure a new WireGuard tunnel</p>
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label>Name</label>
+          <input type="text" placeholder="wg-custom" />
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label>Private Key</label>
+          <input type="password" placeholder="Key data..." />
+        </div>
+        <div class="form-group" style="text-align: left;">
+          <label>IP Addresses</label>
+          <input type="text" placeholder="10.0.0.2/24" />
+        </div>
+        <div class="modal-actions">
+          <button class="action-btn action-btn--hollow" onclick="hideModal('wg-modal')">Cancel</button>
+          <button class="action-btn action-btn--primary" onclick="hideModal('wg-modal')">Create</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ==== INNER TAB NAVIGATION ==== */
+      const networkSlider = document.getElementById('network-slider');
+      const mainTitle = document.getElementById('main-view-title');
+
+      function goToView(index, titleText) {
+        networkSlider.style.transform = `translateX(-${index * 20}%)`;
+        if (titleText) {
+           mainTitle.innerText = titleText;
+        }
+        closeProperties(); // Close flyout if navigating away
+      }
+
+      /* ==== PROPERTIES SLIDE-IN ==== */
+      const propertiesOverlay = document.getElementById('properties-overlay');
+      
+      function openProperties() {
+        propertiesOverlay.classList.add('is-active');
+      }
+      function closeProperties() {
+        propertiesOverlay.classList.remove('is-active');
+      }
+
+      /* ==== UI INTERACTIONS ==== */
+      function toggleSwitch(element) {
+        element.classList.toggle('toggle-switch--on');
+        const isChecked = element.getAttribute('aria-checked') === 'true';
+        element.setAttribute('aria-checked', !isChecked);
+      }
+
+      function toggleExpand(element) {
+        const card = element.closest('.net-card');
+        card.classList.toggle('is-expanded');
+      }
+
+      function disconnectMock(btn) {
+        const card = btn.closest('.net-card');
+        card.classList.remove('net-card--active');
+        const subtitle = card.querySelector('.net-card__subtitle');
+        subtitle.innerHTML = 'Disconnected';
+        btn.innerText = 'Connect';
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          card.classList.add('net-card--active');
+          subtitle.innerHTML = 'Connected, secured <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>';
+          btn.innerText = 'Disconnect';
+          btn.onclick = (ev) => disconnectMock(btn);
+        }
+      }
+
+      /* ==== MODALS ==== */
+      function showModal(id) {
+        document.getElementById(id).classList.add('is-visible');
+      }
+      function hideModal(id) {
+        document.getElementById(id).classList.remove('is-visible');
+      }
+    </script>
+  </body>
+</html>

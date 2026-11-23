@@ -1,0 +1,62 @@
+button.feature-btn {
+  min-height: 0;
+  padding: 18px 8px;
+  border-radius: 14px;
+  background: @hs_card;
+  border: 1px solid @hs_border;
+  box-shadow: 0 4px 6px @hs_shadow;
+  color: @hs_fg;
+  background-image: none;
+  transition: background 200ms, border-color 200ms;
+}
+
+button.feature-btn:hover:not(.feature-btn--unsupported) {
+  background: @hs_hover;
+}
+
+button.feature-btn--active {
+  background: alpha(@hs_accent, 0.15);
+  border-color: alpha(@hs_accent, 0.5);
+  box-shadow: inset 0 0 0 1px alpha(@hs_accent, 0.2), 0 4px 6px @hs_shadow;
+}
+
+button.feature-btn--active:hover:not(.feature-btn--unsupported) {
+  background: alpha(@hs_accent, 0.2);
+}
+
+button.feature-btn--unsupported {
+  opacity: 0.48;
+  border-color: alpha(@hs_border, 0.8);
+  background: alpha(@hs_card, 0.6);
+}
+
+button.feature-btn--unsupported .feature-btn__icon,
+button.feature-btn--unsupported .feature-btn__title,
+button.feature-btn--unsupported .feature-btn__subtitle {
+  color: @hs_dim;
+}
+
+.feature-btn__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: @hs_fg;
+}
+
+button.feature-btn--active .feature-btn__title {
+  color: @hs_accent;
+}
+
+.feature-btn__subtitle {
+  font-size: 11px;
+  color: @hs_dim;
+  margin-top: 2px;
+}
+
+.feature-btn__icon {
+  min-width: 32px;
+  min-height: 32px;
+}
+
+button.feature-btn--active .feature-btn__icon {
+  color: @hs_accent;
+}

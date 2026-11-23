@@ -1,0 +1,17 @@
+connection.id:Home:5G
+connection.uuid:3f1c0f0e-0000-4000-8000-000000000001
+connection.type:802-11-wireless
+connection.autoconnect:yes
+connection.metered:yes
+802-11-wireless.ssid:Home:5G
+802-11-wireless.bssid:
+802-11-wireless.cloned-mac-address:stable
+802-11-wireless-security.key-mgmt:wpa-psk
+ipv4.method:manual
+ipv4.addresses:192.168.1.50/24
+ipv4.gateway:192.168.1.1
+ipv4.dns:1.1.1.1,9.9.9.9
+ipv6.method:auto
+ipv6.addresses:--
+ipv6.gateway:
+ipv6.dns:

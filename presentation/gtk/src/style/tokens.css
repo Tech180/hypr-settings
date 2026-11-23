@@ -1,0 +1,15 @@
+/* Offline default. ~/.config/hypr-settings/tokens.css replaces this sheet when it exists. */
+@define-color hs_warning #f2a007;
+@define-color hs_bg #0a0a0a;
+@define-color hs_card #16222e;
+@define-color hs_border #2c313a;
+@define-color hs_accent #04bfbf;
+@define-color hs_fg #e7f7f7;
+@define-color hs_dim #9da5b4;
+@define-color hs_danger #ff2a2a;
+@define-color hs_teal #0c99a4;
+@define-color hs_hover alpha(@hs_fg, 0.05);
+@define-color hs_shadow alpha(@hs_bg, 0.35);
+@define-color hs_accent_glow alpha(@hs_accent, 0.15);
+@define-color hs_trial_bg alpha(@hs_warning, 0.12);
+@define-color hs_on_warning @hs_bg;

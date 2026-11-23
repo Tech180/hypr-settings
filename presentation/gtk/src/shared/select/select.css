@@ -1,0 +1,137 @@
+.select {
+  min-width: 0;
+}
+
+.select__trigger {
+  min-height: 40px;
+  padding: 10px 14px;
+  border: 1px solid @hs_border;
+  border-radius: 10px;
+  background: @hs_card;
+  background-image: none;
+  box-shadow: none;
+  color: @hs_fg;
+  transition: border-radius 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+}
+
+.select__trigger:hover:not(:disabled) {
+  background: @hs_hover;
+}
+
+.select__trigger:focus-visible {
+  border-color: @hs_accent;
+  box-shadow: 0 0 0 2px @hs_accent_glow;
+}
+
+.select--open .select__trigger {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-color: @hs_border;
+  background: @hs_card;
+}
+
+.select__value {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.select__value--placeholder {
+  color: @hs_dim;
+  font-weight: 400;
+}
+
+.select__icon {
+  color: @hs_dim;
+  transition: transform 400ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.select--open .select__icon {
+  transform: rotate(180deg);
+}
+
+/* Popover so the menu escapes overflow:hidden ancestors and receives clicks. */
+popover.select__popover {
+  background: alpha(@hs_card, 0.94);
+  color: @hs_fg;
+  border: 1px solid @hs_border;
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  box-shadow: 0 10px 15px @hs_shadow;
+  padding: 6px;
+}
+
+popover.select__popover contents {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+.select__scroll {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.select__scroll scrollbar {
+  min-width: 6px;
+  min-height: 6px;
+}
+
+.select__scroll scrollbar slider {
+  background: alpha(@hs_dim, 0.35);
+  border-radius: 999px;
+}
+
+.select__header {
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: @hs_dim;
+}
+
+.select__options {
+  background: transparent;
+}
+
+.select__item {
+  min-height: 36px;
+  padding: 8px 10px 8px 10px;
+  margin: 0;
+  border: none;
+  border-radius: 6px;
+  color: @hs_fg;
+  font-size: 14px;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  transition: background 200ms ease, color 200ms ease;
+}
+
+.select__item:focus-visible {
+  outline: none;
+  background: @hs_hover;
+  box-shadow: 0 0 0 2px @hs_accent_glow;
+}
+
+.select__item:hover {
+  background: @hs_hover;
+}
+
+.select__item--selected {
+  background: @hs_hover;
+  font-weight: 500;
+}
+
+.select__tick {
+  min-width: 16px;
+  color: @hs_fg;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 200ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.select__item--selected .select__tick {
+  opacity: 1;
+  transform: scale(1);
+}

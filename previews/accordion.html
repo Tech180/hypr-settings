@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embla Scaling Carousel</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Embla Carousel Core -->
+  <script src="https://unpkg.com/embla-carousel/embla-carousel.umd.js"></script>
+
+  <style>
+    :root {
+      --bg-color: #09090b; /* Zinc 950 */
+      --card-bg: #18181b;  /* Zinc 900 */
+      --border-color: #27272a; /* Zinc 800 */
+      --text-main: #f4f4f5; /* Zinc 100 */
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      margin: 0;
+    }
+
+    /* Base styles for the slide inner container to ensure smooth transforms */
+    .embla__slide__inner {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* Using will-change to optimize the scaling animation performance */
+      will-change: transform;
+      transition: transform 0.1s ease-out;
+    }
+  </style>
+</head>
+<body class="p-8 antialiased">
+
+  <!-- Main Carousel Wrapper -->
+  <div class="flex w-full flex-col items-center gap-4">
+    
+    <!-- 
+      The exact max-width math from the React component:
+      visible = 3, scale = 0.8
+      row = 1 + (2 * 0.8^1) = 2.6
+      width = 16 * 2.6 = 41.6rem
+      The 100% - 7rem leaves exactly enough room for the absolute buttons.
+    -->
+    <div 
+      id="carousel-root" 
+      class="relative w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl" 
+      tabindex="0"
+      style="max-width: min(41.6rem, calc(100% - 7rem));"
+    >
+      
+      <!-- Embla Viewport -->
+      <div class="overflow-hidden rounded-xl" id="embla-viewport">
+        <!-- -ml-4 offsets the pl-4 on the items for a neat gap -->
+        <div class="flex -ml-4 items-center" id="embla-container">
+          
+          <!-- Slide 1 -->
+          <div class="pl-4 min-w-0 shrink-0 grow-0" style="flex: 0 0 calc(100% / 2.6);">
+            <div class="embla__slide__inner">
+              <div class="w-full aspect-[13/15] flex items-center justify-center p-6 bg-[#18181b] border border-white/5 rounded-2xl shadow-xl">
+                <span class="text-[40px] font-bold select-none text-white tracking-tight">1</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 2 -->
+          <div class="pl-4 min-w-0 shrink-0 grow-0" style="flex: 0 0 calc(100% / 2.6);">
+            <div class="embla__slide__inner">
+              <div class="w-full aspect-[13/15] flex items-center justify-center p-6 bg-[#18181b] border border-white/5 rounded-2xl shadow-xl">
+                <span class="text-[40px] font-bold select-none text-white tracking-tight">2</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 3 -->
+          <div class="pl-4 min-w-0 shrink-0 grow-0" style="flex: 0 0 calc(100% / 2.6);">
+            <div class="embla__slide__inner">
+              <div class="w-full aspect-[13/15] flex items-center justify-center p-6 bg-[#18181b] border border-white/5 rounded-2xl shadow-xl">
+                <span class="text-[40px] font-bold select-none text-white tracking-tight">3</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 4 -->
+          <div class="pl-4 min-w-0 shrink-0 grow-0" style="flex: 0 0 calc(100% / 2.6);">
+            <div class="embla__slide__inner">
+              <div class="w-full aspect-[13/15] flex items-center justify-center p-6 bg-[#18181b] border border-white/5 rounded-2xl shadow-xl">
+                <span class="text-[40px] font-bold select-none text-white tracking-tight">4</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Slide 5 -->
+          <div class="pl-4 min-w-0 shrink-0 grow-0" style="flex: 0 0 calc(100% / 2.6);">
+            <div class="embla__slide__inner">
+              <div class="w-full aspect-[13/15] flex items-center justify-center p-6 bg-[#18181b] border border-white/5 rounded-2xl shadow-xl">
+                <span class="text-[40px] font-bold select-none text-white tracking-tight">5</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Navigation Buttons (Absolutely positioned outside the viewport) -->
+      <button 
+        id="btn-prev" 
+        class="absolute touch-manipulation rounded-full inset-y-0 -left-14 my-auto flex h-9 w-9 items-center justify-center border border-white/10 bg-[#18181b] text-white shadow-sm hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-label="Previous slide"
+      >
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+      </button>
+
+      <button 
+        id="btn-next" 
+        class="absolute touch-manipulation rounded-full inset-y-0 -right-14 my-auto flex h-9 w-9 items-center justify-center border border-white/10 bg-[#18181b] text-white shadow-sm hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-label="Next slide"
+      >
+        <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </button>
+
+    </div>
+
+    <!-- Pagination & Counter -->
+    <div class="mt-4 flex flex-col items-center gap-3">
+      <!-- Dots -->
+      <div id="pagination-dots" class="flex gap-2"></div>
+      <!-- Counter -->
+      <div id="pagination-counter" class="text-sm font-medium text-zinc-500"></div>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      // 1. Embla Initial Setup
+      const viewportNode = document.getElementById('embla-viewport');
+      const rootNode = document.getElementById('carousel-root');
+      
+      // Embla Options matching the React props: { loop: true, align: "center", containScroll: false }
+      const options = { loop: true, align: 'center', containScroll: false };
+      const emblaApi = EmblaCarousel(viewportNode, options);
+
+      // DOM Elements
+      const prevBtn = document.getElementById('btn-prev');
+      const nextBtn = document.getElementById('btn-next');
+      const dotsContainer = document.getElementById('pagination-dots');
+      const counterNode = document.getElementById('pagination-counter');
+      
+      // Store inner nodes for tweening
+      const tweenNodes = emblaApi.slideNodes().map((slideNode) => {
+        return slideNode.querySelector('.embla__slide__inner');
+      });
+
+      // 2. Custom Tween Scale & Translate Logic
+      const SCALE_BASE = 0.8;
+
+      const tweenScale = () => {
+        const engine = emblaApi.internalEngine();
+        const scrollProgress = emblaApi.scrollProgress();
+        if (scrollProgress === null) return;
+        
+        const numSlides = emblaApi.scrollSnapList().length;
+
+        emblaApi.scrollSnapList().forEach((scrollSnap, slideIndex) => {
+          let diffToTarget = scrollSnap - scrollProgress;
+          
+          // Handle loop wrapping correctly
+          if (engine.options.loop) {
+            engine.slideLooper.loopPoints.forEach((loopItem) => {
+              const target = loopItem.target();
+              if (slideIndex === loopItem.index && target !== 0) {
+                const sign = Math.sign(target);
+                if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress);
+                if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress);
+              }
+            });
+          }
+
+          // distance in terms of slides from center
+          const distance = Math.abs(diffToTarget * numSlides);
+          const sign = Math.sign(diffToTarget);
+          
+          // 1. Calculate continuous scale
+          const scale = Math.pow(SCALE_BASE, distance);
+
+          // 2. Calculate continuous translation to perfectly close the visual gaps
+          let offset = 0;
+          let d = distance;
+          let i = 1;
+          while (d > 0) {
+            let step = Math.min(d, 1);
+            let s_prev = Math.pow(SCALE_BASE, i - 1);
+            let s_curr = Math.pow(SCALE_BASE, i);
+            // The translation step required to bridge the scale difference
+            let step_offset = (s_prev + s_curr) / 2 - 1;
+            offset += step_offset * step;
+            d -= step;
+            i++;
+          }
+          
+          const translatePct = offset * 100 * sign;
+          
+          const node = tweenNodes[slideIndex];
+          if (node) {
+            node.style.transform = `translateX(${translatePct}%) scale(${scale})`;
+          }
+        });
+      };
+
+      // 3. UI Sync Logic (Buttons, Dots, Counter)
+      let dotNodes = [];
+
+      const setupDots = () => {
+        dotsContainer.innerHTML = '';
+        dotNodes = emblaApi.scrollSnapList().map((_, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'w-2 h-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-[#09090b]';
+          btn.ariaLabel = `Go to slide ${index + 1}`;
+          btn.addEventListener('click', () => emblaApi.scrollTo(index));
+          dotsContainer.appendChild(btn);
+          return btn;
+        });
+      };
+
+      const updateUI = () => {
+        // Buttons
+        prevBtn.disabled = !emblaApi.canScrollPrev();
+        nextBtn.disabled = !emblaApi.canScrollNext();
+
+        // Dots
+        const selectedIndex = emblaApi.selectedScrollSnap();
+        dotNodes.forEach((btn, i) => {
+          if (i === selectedIndex) {
+            btn.classList.add('bg-white');
+            btn.classList.remove('bg-white/20', 'hover:bg-white/40');
+          } else {
+            btn.classList.add('bg-white/20', 'hover:bg-white/40');
+            btn.classList.remove('bg-white');
+          }
+        });
+
+        // Counter matching the image "Slide 3 of 5"
+        counterNode.textContent = `Slide ${selectedIndex + 1} of ${emblaApi.scrollSnapList().length}`;
+      };
+
+      // 4. Keyboard Navigation
+      rootNode.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          emblaApi.scrollPrev();
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          emblaApi.scrollNext();
+        }
+      });
+
+      // Button listeners
+      prevBtn.addEventListener('click', () => emblaApi.scrollPrev());
+      nextBtn.addEventListener('click', () => emblaApi.scrollNext());
+
+      // Bind events
+      emblaApi.on('init', setupDots);
+      emblaApi.on('init', updateUI);
+      emblaApi.on('init', tweenScale);
+      
+      emblaApi.on('reInit', setupDots);
+      emblaApi.on('reInit', updateUI);
+      emblaApi.on('reInit', tweenScale);
+      
+      emblaApi.on('select', updateUI);
+      emblaApi.on('scroll', tweenScale);
+
+    });
+  </script>
+</body>
+</html>

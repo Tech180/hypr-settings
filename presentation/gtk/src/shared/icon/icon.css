@@ -1,0 +1,32 @@
+.icon {
+  color: @hs_fg;
+}
+
+.icon-tile .icon,
+.boxed-row__chevron,
+.boxed-row__glyph,
+.net-card__chevron,
+.net-card__icon .icon {
+  color: inherit;
+}
+
+/* DrawingArea does not resolve `inherit`; set the glyph color on the icon widget. */
+button.action-btn .icon {
+  color: @hs_accent;
+}
+
+button.action-btn--danger .icon {
+  color: @hs_danger;
+}
+
+button.bar-btn .icon {
+  color: @hs_dim;
+}
+
+button.bar-btn--wide .icon {
+  color: @hs_fg;
+}
+
+button.bar-btn:hover .icon {
+  color: @hs_fg;
+}

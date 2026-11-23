@@ -1,0 +1,37 @@
+.profile-detail__bar {
+  min-height: 52px;
+  padding: 0 56px 0 16px;
+  background: @hs_card;
+  border-bottom: 1px solid @hs_border;
+}
+
+button.bar-btn {
+  min-height: 32px;
+  min-width: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  background-image: none;
+  box-shadow: none;
+  color: @hs_dim;
+  transition: background 200ms, color 200ms;
+}
+
+button.bar-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: @hs_fg;
+}
+
+button.bar-btn--wide {
+  padding: 0 12px;
+  color: @hs_fg;
+}
+
+button.bar-btn--danger {
+  color: @hs_danger;
+}
+
+button.bar-btn--danger:disabled {
+  opacity: 0.35;
+}

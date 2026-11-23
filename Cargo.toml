@@ -1,0 +1,77 @@
+[workspace]
+resolver = "2"
+members = [
+  ".",
+  "domain/settings",
+  "application/settings",
+  "adapter/hardware",
+  "adapter/hyprland",
+  "adapter/kanshi",
+  "adapter/system",
+  "adapter/bluetooth",
+  "adapter/network",
+  "presentation/gtk",
+  "presentation/cli",
+]
+
+[workspace.package]
+version = "0.0.1"
+edition = "2026"
+license = "UNLICENSED"
+publish = false
+
+[workspace.dependencies]
+settings-domain = { path = "domain/settings" }
+settings-application = { path = "application/settings" }
+adapter-hardware = { path = "adapter/hardware" }
+adapter-hyprland = { path = "adapter/hyprland" }
+adapter-kanshi = { path = "adapter/kanshi" }
+adapter-system = { path = "adapter/system" }
+adapter-bluetooth = { path = "adapter/bluetooth" }
+adapter-network = { path = "adapter/network" }
+presentation-gtk = { path = "presentation/gtk" }
+presentation-cli = { path = "presentation/cli" }
+async-channel = "2.5.0"
+clap = { version = "4.6.7", features = ["derive"] }
+qrcode = { version = "0.14.1", default-features = false }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+thiserror = "2.0.21"
+toml = "1.1.8"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+
+[workspace.lints.rust]
+[workspace.lints.clippy]
+
+[package]
+name = "hypr-settings"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "hypr-settings"
+path = "src/main.rs"
+
+[dependencies]
+settings-domain.workspace = true
+settings-application.workspace = true
+adapter-hardware.workspace = true
+adapter-hyprland.workspace = true
+adapter-kanshi.workspace = true
+adapter-system.workspace = true
+adapter-bluetooth.workspace = true
+adapter-network.workspace = true
+presentation-gtk.workspace = true
+presentation-cli.workspace = true
+clap.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+toml.workspace = true
+
+[lints]
+workspace = true

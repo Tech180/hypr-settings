@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>hypr-settings — Bluetooth</title>
+    
+    <style>
+      /* Base Variables (Tron Legacy + Layout) */
+      :root {
+        --accent-color: #04bfbf;
+        --accent-bg-color: #04bfbf;
+        --window-bg-color: #0a0a0a;
+        --window-fg-color: #e7f7f7;
+        --view-bg-color: #16222e;
+        --view-fg-color: #e7f7f7;
+        --headerbar-bg-color: #16222e;
+        --headerbar-fg-color: #e7f7f7;
+        --headerbar-border-color: #16222e;
+        --card-bg-color: #16222e;
+        --card-fg-color: #e7f7f7;
+        --card-border-color: #2c313a;
+        --dim-label-color: #9da5b4;
+        --hs-warning: #f5a524;
+        --hs-error: #f87171;
+        --shade-color: rgba(0, 0, 0, 0.36);
+        
+        --sidebar-width: 260px;
+        --headerbar-height: 52px;
+        --font-ui: "JetBrainsMono Nerd Font", "JetBrains Mono", ui-monospace, system-ui, sans-serif;
+        
+        /* Effects */
+        --shadow-shell: 0 24px 48px var(--shade-color), 0 0 0 1px var(--card-border-color);
+        --shadow-glow: 0 0 20px rgba(4, 191, 191, 0.15);
+        --shadow-glow-strong: 0 0 12px rgba(4, 191, 191, 0.4);
+      }
+
+      /* Reset & Base Styles */
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        height: 100%;
+        margin: 0;
+        font-family: var(--font-ui);
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        padding: 24px;
+        font: 12px / 1.5 var(--font-ui);
+        color: var(--window-fg-color);
+        background: #050505;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1, h2, h3, p, ul {
+        margin: 0;
+        padding: 0;
+      }
+
+      button {
+        font: inherit;
+        border: none;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+
+      button:focus-visible, input:focus-visible, select:focus-visible {
+        outline: 2px solid var(--accent-color);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+
+      /* Structure */
+      .shell {
+        width: 100%;
+        max-width: 1040px;
+        height: calc(100vh - 48px);
+        max-height: 780px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 16px;
+        background: var(--window-bg-color);
+        box-shadow: var(--shadow-shell);
+      }
+
+      .shell__split {
+        flex: 1;
+        display: flex;
+        min-height: 0;
+      }
+
+      /* Sidebar */
+      .shell__sidebar-pane {
+        flex: 0 0 var(--sidebar-width);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        background: var(--window-bg-color);
+        border-right: 1px solid var(--card-border-color);
+        z-index: 10;
+      }
+
+      .headerbar {
+        flex: 0 0 var(--headerbar-height);
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        background: var(--headerbar-bg-color);
+        border-bottom: 1px solid var(--card-border-color);
+      }
+
+      .headerbar--transparent {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: transparent;
+        border-bottom: none;
+        z-index: 20;
+      }
+
+      .headerbar__title {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--headerbar-fg-color);
+      }
+
+      .headerbar__controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .headerbar__window-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dim-label-color);
+        transition: background 0.2s, color 0.2s;
+      }
+
+      .headerbar__window-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--window-fg-color);
+      }
+
+      .headerbar__window-btn--close:hover {
+        background: rgba(220, 38, 38, 0.9);
+        color: #fff;
+      }
+
+      .sidebar {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        padding-bottom: 8px;
+        background: color-mix(in srgb, var(--window-bg-color) 50%, transparent);
+      }
+
+      .section-search-wrap {
+        padding: 16px;
+      }
+
+      .section-search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        height: 36px;
+        padding: 0 12px;
+        border: 1px solid var(--card-border-color);
+        border-radius: 8px;
+        background: var(--view-bg-color);
+        color: var(--view-fg-color);
+        transition: all 0.2s;
+      }
+
+      .section-search:focus-within {
+        border-color: color-mix(in srgb, var(--accent-color) 50%, transparent);
+        box-shadow: var(--shadow-glow);
+      }
+
+      .section-search__icon {
+        width: 16px;
+        height: 16px;
+        opacity: 0.5;
+      }
+
+      .section-search input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        outline: none;
+      }
+
+      .section-search input::placeholder {
+        color: var(--dim-label-color);
+      }
+
+      .sidebar__scroller {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+      }
+
+      .sidebar__list {
+        list-style: none;
+        padding: 4px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .sidebar__row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--dim-label-color);
+        font-weight: 500;
+        cursor: default;
+        transition: all 0.2s;
+      }
+
+      .sidebar__row svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .sidebar__row:hover:not(.sidebar__row--selected) {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--window-fg-color);
+      }
+
+      .sidebar__row--selected {
+        background: color-mix(in srgb, var(--accent-bg-color) 15%, transparent);
+        color: var(--accent-color);
+        font-weight: 600;
+        box-shadow: var(--shadow-glow);
+      }
+
+      /* Content Area */
+      .shell__content-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .views-slider {
+        display: flex;
+        width: 300%;
+        height: 100%;
+        transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        transform: translateX(0); /* Controlled by JS */
+      }
+
+      .view {
+        width: 33.3333%;
+        height: 100%;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .page-content {
+        max-width: 840px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 48px 32px 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+      }
+
+      /* Section Headers */
+      .section-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 12px;
+        padding: 0 4px;
+      }
+
+      .section-title {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--dim-label-color);
+        text-transform: uppercase;
+      }
+      
+      /* Bento / Boxed Groups */
+      .boxed-group {
+        display: flex;
+        flex-direction: column;
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 14px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        overflow: hidden;
+      }
+
+      .boxed-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        border-bottom: 1px solid color-mix(in srgb, var(--card-border-color) 50%, transparent);
+        min-height: 64px;
+        gap: 16px;
+        transition: background 0.2s;
+      }
+
+      .boxed-row:last-child {
+        border-bottom: none;
+      }
+      
+      .boxed-row--clickable {
+        cursor: pointer;
+      }
+      
+      .boxed-row--clickable:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      /* Master Toggle Row Styling */
+      .master-toggle-row {
+        padding: 20px 24px;
+      }
+      .master-toggle-row .boxed-row__title {
+        font-size: 16px;
+        font-weight: 700;
+      }
+
+      .boxed-row__icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--view-bg-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dim-label-color);
+        flex-shrink: 0;
+        transition: all 0.3s;
+      }
+      
+      .boxed-row--connected .boxed-row__icon {
+        background: var(--accent-color);
+        color: var(--window-bg-color);
+        box-shadow: 0 0 12px rgba(4, 191, 191, 0.4);
+      }
+
+      .boxed-row__text {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .boxed-row__title {
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--window-fg-color);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        transition: color 0.3s;
+      }
+      
+      .boxed-row--connected .boxed-row__title {
+        color: var(--accent-color);
+      }
+
+      .boxed-row__subtitle {
+        font-size: 12px;
+        color: var(--dim-label-color);
+        margin-top: 3px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .boxed-row__actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+
+      /* Toggles */
+      .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        border-radius: 999px;
+        background: var(--card-border-color);
+        cursor: pointer;
+        transition: background 0.3s;
+        flex-shrink: 0;
+      }
+
+      .toggle-switch--on {
+        background: var(--accent-bg-color);
+        box-shadow: var(--shadow-glow);
+      }
+
+      .toggle-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--window-fg-color);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        pointer-events: none;
+      }
+
+      .toggle-switch--on .toggle-thumb {
+        transform: translateX(20px);
+      }
+
+      /* Pills & Badges */
+      .battery-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--dim-label-color) 15%, transparent);
+        color: var(--dim-label-color);
+        font-size: 11px;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+      }
+      
+      .boxed-row--connected .battery-pill {
+        background: color-mix(in srgb, var(--accent-color) 15%, transparent);
+        color: var(--accent-color);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--dim-label-color);
+      }
+      
+      .boxed-row--connected .status-dot {
+        background: var(--accent-color);
+        box-shadow: 0 0 6px var(--accent-color);
+      }
+
+      .chevron {
+        color: var(--dim-label-color);
+        opacity: 0.5;
+        transition: transform 0.2s, opacity 0.2s;
+      }
+      
+      .boxed-row--clickable:hover .chevron {
+        opacity: 1;
+        transform: translateX(2px);
+        color: var(--window-fg-color);
+      }
+
+      /* Action Buttons */
+      .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+
+      .action-btn--primary {
+        background: color-mix(in srgb, var(--accent-bg-color) 15%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent-color) 30%, transparent);
+        color: var(--accent-color);
+      }
+
+      .action-btn--primary:hover {
+        background: color-mix(in srgb, var(--accent-bg-color) 25%, transparent);
+      }
+      
+      .action-btn--danger {
+        background: color-mix(in srgb, var(--hs-error) 10%, transparent);
+        border: 1px solid color-mix(in srgb, var(--hs-error) 30%, transparent);
+        color: var(--hs-error);
+      }
+      
+      .action-btn--danger:hover {
+        background: color-mix(in srgb, var(--hs-error) 20%, transparent);
+      }
+      
+      .action-btn--hollow {
+        border: 1px solid var(--card-border-color);
+        background: transparent;
+      }
+      
+      .action-btn--hollow:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      /* Form Elements */
+      .custom-select {
+        appearance: none;
+        padding: 8px 36px 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--card-border-color);
+        background-color: var(--view-bg-color);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239da5b4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        color: var(--view-fg-color);
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        min-width: 140px;
+        transition: all 0.2s;
+      }
+      
+      .custom-select:focus {
+        border-color: var(--accent-color);
+      }
+
+      /* Dynamic State Containers */
+      .bt-content {
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        transition: opacity 0.4s, transform 0.4s, filter 0.4s;
+      }
+      
+      .bt-content.is-disabled {
+        opacity: 0.3;
+        pointer-events: none;
+        filter: grayscale(80%);
+      }
+
+      /* Empty State */
+      .empty-state {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s;
+      }
+      
+      .empty-state.is-visible {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .empty-state__icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dim-label-color);
+      }
+
+      .empty-state__text {
+        font-size: 14px;
+        color: var(--dim-label-color);
+        max-width: 260px;
+      }
+
+      /* Scanning Spinner */
+      .scanning-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid color-mix(in srgb, var(--dim-label-color) 30%, transparent);
+        border-top-color: var(--dim-label-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 8px;
+        vertical-align: middle;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      /* Subpage Hero */
+      .device-hero {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        padding: 32px 0 16px;
+      }
+      
+      .device-hero__icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: color-mix(in srgb, var(--accent-bg-color) 15%, transparent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--accent-color);
+        box-shadow: 0 0 24px rgba(4, 191, 191, 0.2);
+      }
+      
+      .device-hero__title {
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--window-fg-color);
+      }
+      
+      .device-hero__status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--accent-color);
+        font-weight: 600;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell" role="application" aria-label="Settings">
+      <div class="shell__split">
+        
+        <!-- SIDEBAR PANE -->
+        <div class="shell__sidebar-pane">
+          <header class="headerbar">
+            <h1 class="headerbar__title">Settings</h1>
+            <div class="headerbar__controls">
+              <button type="button" class="headerbar__window-btn" aria-label="Menu">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+              </button>
+            </div>
+          </header>
+          
+          <div class="sidebar">
+            <div class="section-search-wrap">
+              <label class="section-search">
+                <svg class="section-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="search" placeholder="Search settings" aria-label="Search settings" />
+              </label>
+            </div>
+            
+            <div class="sidebar__scroller">
+              <ul class="sidebar__list">
+                <li class="sidebar__row">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                  Display
+                </li>
+                <li class="sidebar__row sidebar__row--selected">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11L12 23V1l5.5 5.5-11 11"></path></svg>
+                  Bluetooth
+                </li>
+                <li class="sidebar__row">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                  Network
+                </li>
+                <li class="sidebar__row">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
+                  Performance
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT PANE -->
+        <div class="shell__content-pane">
+          <div class="views-slider" id="views-slider">
+            
+            <!-- MAIN VIEW: Bluetooth Dashboard -->
+            <div class="view view--main">
+              <header class="headerbar headerbar--transparent">
+                <div class="headerbar__title"></div>
+                <div class="headerbar__controls">
+                  <button type="button" class="headerbar__window-btn headerbar__window-btn--close" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+              </header>
+
+              <div class="page-content" style="position: relative;">
+                
+                <!-- Master Toggle -->
+                <div class="boxed-group">
+                  <div class="boxed-row master-toggle-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Bluetooth</p>
+                      <p class="boxed-row__subtitle">Discoverable as "Arch-Desktop"</p>
+                    </div>
+                    <div class="toggle-switch toggle-switch--on" id="master-toggle" role="switch" aria-checked="true">
+                      <span class="toggle-thumb"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Empty State (Hidden when ON) -->
+                <div class="empty-state" id="empty-state">
+                  <div class="empty-state__icon">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5l11 11L12 23V1l5.5 5.5-11 11"></path></svg>
+                  </div>
+                  <p class="empty-state__text">Turn on Bluetooth to connect to accessories and share files with nearby devices.</p>
+                </div>
+
+                <!-- Main Content Lists (Fades out when OFF) -->
+                <div class="bt-content" id="bt-content">
+                  
+                  <!-- Paired Devices -->
+                  <section>
+                    <div class="section-header">
+                      <h2 class="section-title">My Devices</h2>
+                    </div>
+                    
+                    <div class="boxed-group">
+                      
+                      <!-- Connected Device -->
+                      <div class="boxed-row boxed-row--clickable boxed-row--connected" onclick="goToSubpage('Sony WH-1000XM4', 'headphones', true)">
+                        <div class="boxed-row__icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+                        </div>
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Sony WH-1000XM4</p>
+                          <p class="boxed-row__subtitle">
+                            <span class="status-dot"></span> Connected
+                            <span class="battery-pill">
+                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
+                              75%
+                            </span>
+                          </p>
+                        </div>
+                        <div class="boxed-row__actions">
+                          <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                      </div>
+
+                      <!-- Disconnected Device -->
+                      <div class="boxed-row boxed-row--clickable" onclick="goToSubpage('Keychron K2', 'keyboard', false)">
+                        <div class="boxed-row__icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2" ry="2"></rect><line x1="12" y1="14" x2="12" y2="14"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="10" y1="10" x2="10" y2="10"></line><line x1="14" y1="10" x2="14" y2="10"></line><line x1="6" y1="10" x2="6" y2="10"></line><line x1="18" y1="10" x2="18" y2="10"></line></svg>
+                        </div>
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Keychron K2</p>
+                          <p class="boxed-row__subtitle">Not Connected</p>
+                        </div>
+                        <div class="boxed-row__actions">
+                          <button class="action-btn action-btn--hollow" style="padding: 4px 12px; font-size: 11px;" onclick="event.stopPropagation();">Connect</button>
+                          <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                      </div>
+
+                      <!-- Disconnected Device -->
+                      <div class="boxed-row boxed-row--clickable" onclick="goToSubpage('Logitech MX Master 3', 'mouse', false)">
+                        <div class="boxed-row__icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="7"></rect><path d="M5 9h14"></path><path d="M12 2v7"></path></svg>
+                        </div>
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Logitech MX Master 3</p>
+                          <p class="boxed-row__subtitle">Not Connected</p>
+                        </div>
+                        <div class="boxed-row__actions">
+                          <button class="action-btn action-btn--hollow" style="padding: 4px 12px; font-size: 11px;" onclick="event.stopPropagation();">Connect</button>
+                          <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                      </div>
+
+                    </div>
+                  </section>
+
+                  <!-- Available Devices -->
+                  <section>
+                    <div class="section-header">
+                      <h2 class="section-title">Other Devices <span class="scanning-spinner" id="scanner"></span></h2>
+                    </div>
+                    
+                    <div class="boxed-group">
+                      <div class="boxed-row boxed-row--clickable">
+                        <div class="boxed-row__icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                        </div>
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Pixel 7 Pro</p>
+                          <p class="boxed-row__subtitle">Ready to pair</p>
+                        </div>
+                      </div>
+
+                      <div class="boxed-row boxed-row--clickable" style="display: none;" id="mock-discovered-device">
+                        <div class="boxed-row__icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.54 15H17a2 2 0 0 0-2 2v4.54zm-19.08 0H7a2 2 0 0 1 2 2v4.54zM2.46 9H7a2 2 0 0 0 2-2V2.46zM21.54 9H17a2 2 0 0 1-2-2V2.46z"></path><rect x="9" y="9" width="6" height="6"></rect></svg>
+                        </div>
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">DualSense Wireless Controller</p>
+                          <p class="boxed-row__subtitle">Ready to pair</p>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <!-- Advanced / System -->
+                  <section>
+                    <div class="section-header">
+                      <h2 class="section-title">System</h2>
+                    </div>
+                    <div class="boxed-group">
+                      <div class="boxed-row boxed-row--clickable" onclick="goToAdvanced()">
+                        <div class="boxed-row__icon">
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        </div>
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Advanced Settings</p>
+                          <p class="boxed-row__subtitle">Tethering, LE Audio, and Developer Options</p>
+                        </div>
+                        <div class="boxed-row__actions">
+                          <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                </div>
+              </div>
+            </div>
+
+            <!-- SUB VIEW: DEVICE DETAILS -->
+            <div class="view view--sub">
+              <header class="headerbar headerbar--transparent">
+                <div class="headerbar__controls" style="flex: 1;">
+                  <button class="headerbar__window-btn" onclick="goToMain()" type="button" style="width: auto; padding: 0 12px; gap: 8px; justify-content: flex-start; color: var(--window-fg-color);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back
+                  </button>
+                </div>
+                <div class="headerbar__title" style="flex: 2; text-align: center;">Device Settings</div>
+                <div class="headerbar__controls" style="flex: 1;"></div>
+              </header>
+
+              <div class="page-content" style="padding-top: 16px;">
+                
+                <div class="device-hero">
+                  <div class="device-hero__icon" id="subpage-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path></svg>
+                  </div>
+                  <div style="text-align: center;">
+                    <h2 class="device-hero__title" id="subpage-title">Sony WH-1000XM4</h2>
+                    <div class="device-hero__status" id="subpage-status">
+                      <span class="status-dot"></span> Connected
+                    </div>
+                  </div>
+                </div>
+
+                <div class="boxed-group">
+                  <div class="boxed-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Connection</p>
+                      <p class="boxed-row__subtitle">Toggle active link to device</p>
+                    </div>
+                    <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true" id="device-connect-toggle">
+                      <span class="toggle-thumb"></span>
+                    </div>
+                  </div>
+
+                  <div class="boxed-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Device Type</p>
+                    </div>
+                    <select class="custom-select" aria-label="Device Type" id="subpage-select-type">
+                      <option value="headphones" selected>Headphones</option>
+                      <option value="keyboard">Keyboard</option>
+                      <option value="mouse">Mouse</option>
+                      <option value="phone">Phone</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+
+                  <div class="boxed-row" id="codec-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Audio Codec</p>
+                      <p class="boxed-row__subtitle">LDAC offers highest quality</p>
+                    </div>
+                    <select class="custom-select" aria-label="Audio Codec">
+                      <option selected>LDAC (High Quality)</option>
+                      <option>aptX HD</option>
+                      <option>AAC</option>
+                      <option>SBC (Standard)</option>
+                    </select>
+                  </div>
+                  
+                  <div class="boxed-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Battery Level</p>
+                    </div>
+                    <div class="battery-pill" style="font-size: 13px; padding: 4px 12px; background: color-mix(in srgb, var(--accent-color) 15%, transparent); color: var(--accent-color);" id="subpage-battery">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg>
+                      75%
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Profiles & Permissions -->
+                <div class="boxed-group">
+                  <div class="boxed-row" style="background: rgba(255,255,255,0.02); min-height: 48px; padding: 12px 20px;">
+                    <p class="boxed-row__title" style="color: var(--dim-label-color); text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em;">Profiles & Access</p>
+                  </div>
+                  
+                  <div class="boxed-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Media Audio (A2DP)</p>
+                      <p class="boxed-row__subtitle">High-quality stereo streaming</p>
+                    </div>
+                    <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true">
+                      <span class="toggle-thumb"></span>
+                    </div>
+                  </div>
+
+                  <div class="boxed-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Phone Calls (HFP/HSP)</p>
+                      <p class="boxed-row__subtitle">Microphone and call audio routing</p>
+                    </div>
+                    <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true">
+                      <span class="toggle-thumb"></span>
+                    </div>
+                  </div>
+
+                  <div class="boxed-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Absolute Volume</p>
+                      <p class="boxed-row__subtitle">Sync system volume with hardware</p>
+                    </div>
+                    <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true">
+                      <span class="toggle-thumb"></span>
+                    </div>
+                  </div>
+
+                  <div class="boxed-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Contact & Message Sharing</p>
+                      <p class="boxed-row__subtitle">Grant PBAP/MAP access to this device</p>
+                    </div>
+                    <div class="toggle-switch" role="switch" aria-checked="false">
+                      <span class="toggle-thumb"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="boxed-group">
+                  <div class="boxed-row">
+                    <div class="boxed-row__text">
+                      <p class="boxed-row__title">Forget Device</p>
+                      <p class="boxed-row__subtitle">Remove pairing information</p>
+                    </div>
+                    <button class="action-btn action-btn--danger" onclick="goToMain()">Forget</button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- SUB VIEW: ADVANCED SETTINGS -->
+            <div class="view view--advanced">
+              <header class="headerbar headerbar--transparent">
+                <div class="headerbar__controls" style="flex: 1;">
+                  <button class="headerbar__window-btn" onclick="goToMain()" type="button" style="width: auto; padding: 0 12px; gap: 8px; justify-content: flex-start; color: var(--window-fg-color);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back
+                  </button>
+                </div>
+                <div class="headerbar__title" style="flex: 2; text-align: center;">Advanced Settings</div>
+                <div class="headerbar__controls" style="flex: 1;"></div>
+              </header>
+
+              <div class="page-content" style="padding-top: 48px;">
+                
+                <!-- Hardware Information -->
+                <section>
+                  <div class="section-header">
+                    <h2 class="section-title">Hardware Information</h2>
+                  </div>
+                  <div class="boxed-group">
+                    <div class="boxed-row">
+                      <div class="boxed-row__icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+                      </div>
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">Bluetooth Controller</p>
+                        <p class="boxed-row__subtitle">Intel Corporation AX210 (hci0)</p>
+                      </div>
+                      <div class="boxed-row__actions">
+                        <span style="font-family: var(--font-ui); font-size: 11px; color: var(--dim-label-color); letter-spacing: 0.05em;">E4:12:F8:9B:00:1A</span>
+                      </div>
+                    </div>
+                    
+                    <div class="boxed-row">
+                      <div class="boxed-row__icon">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                      </div>
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">Core Specification</p>
+                        <p class="boxed-row__subtitle">Firmware supported protocol</p>
+                      </div>
+                      <div class="boxed-row__actions">
+                        <span class="badge" style="border-color: color-mix(in srgb, var(--accent-color) 40%, transparent); background: color-mix(in srgb, var(--accent-color) 10%, transparent); color: var(--accent-color); text-transform: none; letter-spacing: 0; font-size: 11px; padding: 4px 10px; border-radius: 999px;">Bluetooth 5.3 (LMP 12)</span>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Connectivity & LE Audio -->
+                <section>
+                  <div class="section-header">
+                    <h2 class="section-title">Connectivity & LE Audio</h2>
+                  </div>
+                  <div class="boxed-group">
+                    <div class="boxed-row">
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">Bluetooth Tethering (PAN)</p>
+                        <p class="boxed-row__subtitle">Share host internet connection</p>
+                      </div>
+                      <div class="toggle-switch" role="switch" aria-checked="false">
+                        <span class="toggle-thumb"></span>
+                      </div>
+                    </div>
+                    
+                    <div class="boxed-row boxed-row--clickable">
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">Auracast™ Broadcast Audio</p>
+                        <p class="boxed-row__subtitle">Host or join LE Audio public streams</p>
+                      </div>
+                      <div class="boxed-row__actions">
+                        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Developer Options -->
+                <section>
+                  <div class="section-header">
+                    <h2 class="section-title" style="color: var(--hs-warning);">Developer Options</h2>
+                  </div>
+                  <div class="boxed-group" style="border-color: color-mix(in srgb, var(--hs-warning) 30%, transparent);">
+                    
+                    <div class="boxed-row">
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">AVRCP Version</p>
+                        <p class="boxed-row__subtitle">For vehicle infotainment compatibility</p>
+                      </div>
+                      <select class="custom-select" aria-label="AVRCP Version">
+                        <option>AVRCP 1.3</option>
+                        <option>AVRCP 1.4</option>
+                        <option selected>AVRCP 1.5 (Default)</option>
+                        <option>AVRCP 1.6</option>
+                      </select>
+                    </div>
+
+                    <div class="boxed-row">
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">Audio Sample Rate</p>
+                      </div>
+                      <select class="custom-select" aria-label="Audio Sample Rate">
+                        <option>44.1 kHz</option>
+                        <option selected>48.0 kHz</option>
+                        <option>88.2 kHz</option>
+                        <option>96.0 kHz</option>
+                      </select>
+                    </div>
+
+                    <div class="boxed-row">
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">Disable A2DP Hardware Offload</p>
+                        <p class="boxed-row__subtitle">Force software CPU/DSP audio encoding</p>
+                      </div>
+                      <div class="toggle-switch" role="switch" aria-checked="false">
+                        <span class="toggle-thumb"></span>
+                      </div>
+                    </div>
+
+                    <div class="boxed-row">
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">HCI Snoop Log Capture</p>
+                        <p class="boxed-row__subtitle">Record raw packets to btsnoop_hci.log</p>
+                      </div>
+                      <div class="toggle-switch" role="switch" aria-checked="false">
+                        <span class="toggle-thumb"></span>
+                      </div>
+                    </div>
+                    
+                    <div class="boxed-row boxed-row--clickable">
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title" style="color: var(--hs-error);">Clear GATT Attribute Cache</p>
+                        <p class="boxed-row__subtitle">Force re-discovery of BLE services</p>
+                      </div>
+                    </div>
+
+                  </div>
+                </section>
+
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ==== MASTER TOGGLE LOGIC ==== */
+      const masterToggle = document.getElementById('master-toggle');
+      const btContent = document.getElementById('bt-content');
+      const emptyState = document.getElementById('empty-state');
+      const scanner = document.getElementById('scanner');
+
+      masterToggle.addEventListener('click', function() {
+        this.classList.toggle('toggle-switch--on');
+        const isOn = this.classList.contains('toggle-switch--on');
+        this.setAttribute('aria-checked', isOn);
+
+        if (isOn) {
+          btContent.classList.remove('is-disabled');
+          emptyState.classList.remove('is-visible');
+          scanner.style.display = 'inline-block';
+        } else {
+          btContent.classList.add('is-disabled');
+          emptyState.classList.add('is-visible');
+          scanner.style.display = 'none';
+        }
+      });
+
+      /* ==== SUBPAGE NAVIGATION LOGIC ==== */
+      const iconMap = {
+        'headphones': '<path d="M3 18v-6a9 9 0 0 1 18 0v6"></path><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>',
+        'keyboard': '<rect x="2" y="6" width="20" height="12" rx="2" ry="2"></rect><line x1="12" y1="14" x2="12" y2="14"></line><line x1="8" y1="14" x2="8" y2="14"></line><line x1="16" y1="14" x2="16" y2="14"></line><line x1="10" y1="10" x2="10" y2="10"></line><line x1="14" y1="10" x2="14" y2="10"></line><line x1="6" y1="10" x2="6" y2="10"></line><line x1="18" y1="10" x2="18" y2="10"></line>',
+        'mouse': '<rect x="5" y="2" width="14" height="20" rx="7"></rect><path d="M5 9h14"></path><path d="M12 2v7"></path>'
+      };
+
+      function goToSubpage(deviceName, type, isConnected) {
+        // Populate data
+        document.getElementById('subpage-title').innerText = deviceName;
+        document.getElementById('subpage-icon').innerHTML = `<svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${iconMap[type]}</svg>`;
+        
+        // Handle select dropdown
+        document.getElementById('subpage-select-type').value = type;
+
+        // Hide/Show audio codec row conditionally
+        document.getElementById('codec-row').style.display = (type === 'headphones') ? 'flex' : 'none';
+
+        // Update status UI
+        const statusEl = document.getElementById('subpage-status');
+        const iconEl = document.getElementById('subpage-icon');
+        const toggleEl = document.getElementById('device-connect-toggle');
+        const batteryEl = document.getElementById('subpage-battery');
+
+        if (isConnected) {
+          statusEl.innerHTML = '<span class="status-dot"></span> Connected';
+          statusEl.style.color = 'var(--accent-color)';
+          iconEl.style.color = 'var(--accent-color)';
+          iconEl.style.background = 'color-mix(in srgb, var(--accent-bg-color) 15%, transparent)';
+          iconEl.style.boxShadow = '0 0 24px rgba(4, 191, 191, 0.2)';
+          toggleEl.classList.add('toggle-switch--on');
+          batteryEl.style.background = 'color-mix(in srgb, var(--accent-color) 15%, transparent)';
+          batteryEl.style.color = 'var(--accent-color)';
+          batteryEl.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="16" height="10" rx="2" ry="2"></rect><line x1="22" y1="11" x2="22" y2="13"></line></svg> 75%';
+        } else {
+          statusEl.innerHTML = '<span class="status-dot" style="background: var(--dim-label-color); box-shadow: none;"></span> Not Connected';
+          statusEl.style.color = 'var(--dim-label-color)';
+          iconEl.style.color = 'var(--dim-label-color)';
+          iconEl.style.background = 'var(--view-bg-color)';
+          iconEl.style.boxShadow = 'none';
+          toggleEl.classList.remove('toggle-switch--on');
+          batteryEl.style.background = 'color-mix(in srgb, var(--dim-label-color) 15%, transparent)';
+          batteryEl.style.color = 'var(--dim-label-color)';
+          batteryEl.innerHTML = 'Unknown';
+        }
+
+        // Slide view to Device Subpage
+        document.getElementById('views-slider').style.transform = 'translateX(-33.3333%)';
+      }
+
+      function goToAdvanced() {
+        // Slide view to Advanced Subpage
+        document.getElementById('views-slider').style.transform = 'translateX(-66.6666%)';
+      }
+
+      function goToMain() {
+        document.getElementById('views-slider').style.transform = 'translateX(0)';
+      }
+
+      /* ==== UI COMPONENT INTERACTIVITY ==== */
+      // General toggles within subpage
+      document.getElementById('device-connect-toggle').addEventListener('click', function() {
+        this.classList.toggle('toggle-switch--on');
+        const isChecked = this.getAttribute('aria-checked') === 'true';
+        this.setAttribute('aria-checked', !isChecked);
+        
+        // Mock simple state change visually on the hero banner
+        const statusEl = document.getElementById('subpage-status');
+        const iconEl = document.getElementById('subpage-icon');
+        
+        if (!isChecked) { // became checked
+          statusEl.innerHTML = '<span class="status-dot"></span> Connected';
+          statusEl.style.color = 'var(--accent-color)';
+          iconEl.style.color = 'var(--accent-color)';
+          iconEl.style.background = 'color-mix(in srgb, var(--accent-bg-color) 15%, transparent)';
+          iconEl.style.boxShadow = '0 0 24px rgba(4, 191, 191, 0.2)';
+        } else {
+          statusEl.innerHTML = '<span class="status-dot" style="background: var(--dim-label-color); box-shadow: none;"></span> Not Connected';
+          statusEl.style.color = 'var(--dim-label-color)';
+          iconEl.style.color = 'var(--dim-label-color)';
+          iconEl.style.background = 'var(--view-bg-color)';
+          iconEl.style.boxShadow = 'none';
+        }
+      });
+
+      // Mock scanning simulation (shows a new device after 4 seconds)
+      setTimeout(() => {
+        const newDevice = document.getElementById('mock-discovered-device');
+        if (newDevice) {
+           // Fade in logic
+           newDevice.style.opacity = '0';
+           newDevice.style.display = 'flex';
+           setTimeout(() => {
+             newDevice.style.transition = 'opacity 0.5s ease';
+             newDevice.style.opacity = '1';
+           }, 50);
+        }
+      }, 4000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+disallowed-methods = [
+  { path = "std::fs::read", reason = "application orchestrates through ports; no IO here" },
+  { path = "std::fs::read_to_string", reason = "application orchestrates through ports; no IO here" },
+  { path = "std::fs::write", reason = "application orchestrates through ports; no IO here" },
+  { path = "std::fs::create_dir_all", reason = "application orchestrates through ports; no IO here" },
+  { path = "std::fs::rename", reason = "application orchestrates through ports; no IO here" },
+  { path = "std::fs::remove_file", reason = "application orchestrates through ports; no IO here" },
+  { path = "std::process::Command::new", reason = "application spawns no processes; use a driven port" },
+  { path = "std::time::Instant::now", reason = "time enters through the Clock port" },
+  { path = "std::time::SystemTime::now", reason = "time enters through the Clock port" },
+  { path = "std::thread::sleep", reason = "sleeping goes through the Clock port" },
+  { path = "std::env::var", reason = "environment access belongs to adapters" },
+]
+disallowed-types = [
+  { path = "std::fs::File", reason = "application performs no IO" },
+  { path = "std::process::Command", reason = "application spawns no processes" },
+]

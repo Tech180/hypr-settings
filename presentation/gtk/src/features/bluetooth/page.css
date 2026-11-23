@@ -1,0 +1,94 @@
+.bluetooth-page .bt-content--disabled {
+  opacity: 0.35;
+}
+
+.bluetooth-page .bt-empty {
+  padding: 24px 0;
+}
+
+.bluetooth-page .bt-empty__text {
+  color: @hs_dim;
+  font-size: 13px;
+}
+
+/* The power switch heads the page, so it reads larger than an ordinary row. */
+.master-toggle .boxed-row {
+  min-height: 72px;
+  padding: 16px 20px;
+}
+
+.master-toggle .boxed-row__title {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.master-toggle .boxed-row__subtitle {
+  font-size: 12px;
+}
+
+.device-row {
+  min-height: 64px;
+}
+
+.device-row--connected {
+  background: alpha(@hs_accent, 0.05);
+}
+
+.device-row--connected .boxed-row__title {
+  color: @hs_accent;
+}
+
+.device-row--connected:hover {
+  background: alpha(@hs_accent, 0.1);
+}
+
+.device-hero {
+  padding: 8px 0 0 0;
+}
+
+.device-hero__title {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.device-hero__status {
+  color: @hs_dim;
+  font-size: 13px;
+}
+
+.bt-scan-spinner {
+  margin-bottom: 16px;
+}
+
+.bt-controller {
+  padding: 24px;
+}
+
+.bt-controller__name {
+  font-size: 18px;
+  font-weight: 700;
+  color: @hs_fg;
+}
+
+.bt-controller__address {
+  font-size: 13px;
+  color: @hs_dim;
+  font-family: monospace;
+  letter-spacing: 0.04em;
+}
+
+.bt-banner {
+  padding: 14px 18px;
+  border: 1px solid alpha(@hs_warning, 0.4);
+  border-radius: 12px;
+  background: alpha(@hs_warning, 0.08);
+}
+
+.bt-banner__text {
+  font-size: 12px;
+  color: @hs_warning;
+}
+
+.bt-developer-group {
+  border-color: alpha(@hs_warning, 0.3);
+}

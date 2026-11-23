@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>hypr-settings — Display (Redesign)</title>
+    
+    <style>
+      /* Base Variables (Tron Legacy + Layout) */
+      :root {
+        --accent-color: #04bfbf;
+        --accent-bg-color: #04bfbf;
+        --window-bg-color: #0a0a0a;
+        --window-fg-color: #e7f7f7;
+        --view-bg-color: #16222e;
+        --view-fg-color: #e7f7f7;
+        --headerbar-bg-color: #16222e;
+        --headerbar-fg-color: #e7f7f7;
+        --headerbar-border-color: #16222e;
+        --card-bg-color: #16222e;
+        --card-fg-color: #e7f7f7;
+        --card-border-color: #2c313a;
+        --dim-label-color: #9da5b4;
+        --hs-warning: #f5a524;
+        --shade-color: rgba(0, 0, 0, 0.36);
+        
+        --sidebar-width: 260px;
+        --headerbar-height: 52px;
+        --font-ui: "JetBrainsMono Nerd Font", "JetBrains Mono", ui-monospace, system-ui, sans-serif;
+        
+        /* Effects */
+        --shadow-shell: 0 24px 48px var(--shade-color), 0 0 0 1px var(--card-border-color);
+        --shadow-glow: 0 0 20px rgba(4, 191, 191, 0.15);
+        --shadow-glow-strong: 0 0 12px rgba(4, 191, 191, 0.4);
+      }
+
+      /* Reset & Base Styles */
+      *, *::before, *::after {
+        box-sizing: border-box;
+      }
+
+      html, body {
+        height: 100%;
+        margin: 0;
+        font-family: var(--font-ui);
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        min-height: 100vh;
+        padding: 24px;
+        font: 12px / 1.5 var(--font-ui);
+        color: var(--window-fg-color);
+        background: #050505;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      h1, h2, h3, p, ul {
+        margin: 0;
+        padding: 0;
+      }
+
+      button {
+        font: inherit;
+        border: none;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+
+      button:focus-visible, input:focus-visible, select:focus-visible {
+        outline: 2px solid var(--accent-color);
+        outline-offset: 2px;
+      }
+
+      /* Structure */
+      .shell {
+        width: 100%;
+        max-width: 1040px;
+        height: calc(100vh - 48px);
+        max-height: 780px;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 16px;
+        background: var(--window-bg-color);
+        box-shadow: var(--shadow-shell);
+      }
+
+      .shell__split {
+        flex: 1;
+        display: flex;
+        min-height: 0;
+      }
+
+      /* Sidebar */
+      .shell__sidebar-pane {
+        flex: 0 0 var(--sidebar-width);
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        background: var(--window-bg-color);
+        border-right: 1px solid var(--card-border-color);
+        z-index: 10;
+      }
+
+      .headerbar {
+        flex: 0 0 var(--headerbar-height);
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        background: var(--headerbar-bg-color);
+        border-bottom: 1px solid var(--card-border-color);
+      }
+
+      .headerbar--transparent {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: transparent;
+        border-bottom: none;
+        z-index: 20;
+      }
+
+      .headerbar__title {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--headerbar-fg-color);
+      }
+
+      .headerbar__controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .headerbar__window-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dim-label-color);
+        transition: background 0.2s, color 0.2s;
+      }
+
+      .headerbar__window-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--window-fg-color);
+      }
+
+      .headerbar__window-btn--close:hover {
+        background: rgba(220, 38, 38, 0.9);
+        color: #fff;
+      }
+
+      .sidebar {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        padding-bottom: 8px;
+        background: color-mix(in srgb, var(--window-bg-color) 50%, transparent);
+      }
+
+      .section-search-wrap {
+        padding: 16px;
+      }
+
+      .section-search {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        height: 36px;
+        padding: 0 12px;
+        border: 1px solid var(--card-border-color);
+        border-radius: 8px;
+        background: var(--view-bg-color);
+        color: var(--view-fg-color);
+        transition: all 0.2s;
+      }
+
+      .section-search:focus-within {
+        border-color: color-mix(in srgb, var(--accent-color) 50%, transparent);
+        box-shadow: var(--shadow-glow);
+      }
+
+      .section-search__icon {
+        width: 16px;
+        height: 16px;
+        opacity: 0.5;
+      }
+
+      .section-search input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        outline: none;
+      }
+
+      .section-search input::placeholder {
+        color: var(--dim-label-color);
+      }
+
+      .sidebar__scroller {
+        flex: 1;
+        overflow-y: auto;
+        min-height: 0;
+      }
+
+      .sidebar__list {
+        list-style: none;
+        padding: 4px 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .sidebar__row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--dim-label-color);
+        font-weight: 500;
+        cursor: default;
+        transition: all 0.2s;
+      }
+
+      .sidebar__row svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .sidebar__row:hover:not(.sidebar__row--selected) {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--window-fg-color);
+      }
+
+      .sidebar__row--selected {
+        background: color-mix(in srgb, var(--accent-bg-color) 15%, transparent);
+        color: var(--accent-color);
+        font-weight: 600;
+        box-shadow: var(--shadow-glow);
+      }
+
+      /* Content Area */
+      .shell__content-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .views-slider {
+        display: flex;
+        width: 200%;
+        height: 100%;
+        transition: transform 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+        transform: translateX(0); /* Controlled by JS */
+      }
+
+      .view {
+        width: 50%;
+        height: 100%;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      .page-content {
+        max-width: 840px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 48px 32px 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+      }
+
+      /* Trial Banner */
+      .trial-banner {
+        position: absolute;
+        top: -100px; /* Hidden initially */
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 20px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--hs-warning) 20%, #16222e);
+        border: 1px solid color-mix(in srgb, var(--hs-warning) 50%, transparent);
+        box-shadow: 0 10px 30px rgba(245, 165, 36, 0.15);
+        backdrop-filter: blur(8px);
+        z-index: 50;
+        color: var(--hs-warning);
+        transition: top 0.4s cubic-bezier(0.4, 0.0, 0.2, 1);
+      }
+
+      .trial-banner.is-visible {
+        top: 16px;
+      }
+
+      .trial-banner__message {
+        font-weight: 600;
+        font-size: 12px;
+      }
+
+      .trial-banner__actions {
+        display: flex;
+        gap: 8px;
+        margin-left: 16px;
+      }
+
+      .trial-btn {
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-weight: 600;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+
+      .trial-btn--revert {
+        background: color-mix(in srgb, var(--window-bg-color) 50%, transparent);
+        color: var(--window-fg-color);
+        border: 1px solid var(--card-border-color);
+      }
+
+      .trial-btn--revert:hover {
+        background: var(--card-border-color);
+      }
+
+      .trial-btn--keep {
+        background: var(--hs-warning);
+        color: #222;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+      }
+
+      .trial-btn--keep:hover {
+        opacity: 0.9;
+      }
+
+      /* Section Headers */
+      .section-header {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        color: var(--window-fg-color);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .section-subtitle {
+        font-size: 13px;
+        color: var(--dim-label-color);
+        margin-top: 4px;
+      }
+      
+      .badge {
+        padding: 2px 8px;
+        border-radius: 4px;
+        border: 1px solid color-mix(in srgb, var(--accent-color) 30%, transparent);
+        background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+        color: var(--accent-color);
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* Monitor Canvas (Highly Accurate & Interactive) */
+      .monitor-canvas {
+        height: 280px;
+        position: relative;
+        overflow: hidden;
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 18px;
+        box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+        touch-action: none; /* Prevent scrolling while dragging */
+        user-select: none;
+      }
+
+      .monitor-canvas::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0.15;
+        background-image: radial-gradient(var(--card-border-color) 1px, transparent 1px);
+        background-size: 24px 24px;
+        background-position: center;
+        z-index: 1;
+      }
+
+      .monitor-item {
+        position: absolute;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        background: var(--window-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 8px;
+        cursor: grab;
+        transition: box-shadow 0.2s, background-color 0.2s, border-color 0.2s;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+      }
+
+      .monitor-item:hover {
+        border-color: color-mix(in srgb, var(--accent-color) 50%, transparent);
+        background: var(--view-bg-color);
+      }
+
+      .monitor-item:active {
+        cursor: grabbing;
+        box-shadow: 0 12px 24px rgba(0,0,0,0.5);
+        z-index: 30;
+      }
+
+      .monitor-item--active {
+        background: var(--view-bg-color);
+        border: 2px solid var(--accent-color);
+        box-shadow: var(--shadow-glow-strong), 0 12px 24px rgba(0,0,0,0.4);
+        z-index: 20;
+      }
+
+      .monitor-item__label {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--dim-label-color);
+        pointer-events: none;
+      }
+
+      .monitor-item--active .monitor-item__label {
+        color: var(--accent-color);
+        font-size: 16px;
+      }
+
+      .monitor-item__res {
+        font-size: 11px;
+        color: color-mix(in srgb, var(--dim-label-color) 70%, transparent);
+        font-variant-numeric: tabular-nums;
+        pointer-events: none;
+      }
+
+      .monitor-item--active .monitor-item__res {
+        color: color-mix(in srgb, var(--window-fg-color) 80%, transparent);
+        font-size: 12px;
+      }
+
+      .monitor-item__badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--accent-bg-color) 20%, transparent);
+        color: var(--accent-color);
+        font-size: 9px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 2px;
+        pointer-events: none;
+      }
+
+      /* Settings Boxed List (Bento Grid) */
+      .bento-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 20px;
+        align-items: start;
+      }
+
+      .bento-col {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .boxed-group {
+        display: flex;
+        flex-direction: column;
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 14px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+
+      .boxed-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-bottom: 1px solid color-mix(in srgb, var(--card-border-color) 50%, transparent);
+        min-height: 56px;
+        gap: 12px;
+      }
+
+      .boxed-row:last-child {
+        border-bottom: none;
+      }
+
+      .boxed-row__text {
+        flex: 1;
+        padding-right: 12px;
+        min-width: 140px;
+      }
+
+      .boxed-row__title {
+        font-size: 13px;
+        font-weight: 600;
+      }
+
+      .boxed-row__subtitle {
+        font-size: 11px;
+        color: var(--dim-label-color);
+        margin-top: 3px;
+      }
+
+      .boxed-row--dim {
+        opacity: 0.55;
+      }
+
+      /* Form Controls */
+      .toggle-switch {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        border-radius: 999px;
+        background: var(--card-border-color);
+        cursor: pointer;
+        transition: background 0.3s;
+        flex-shrink: 0;
+      }
+
+      .toggle-switch--on {
+        background: var(--accent-bg-color);
+        box-shadow: var(--shadow-glow);
+      }
+
+      .toggle-thumb {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: var(--window-fg-color);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        pointer-events: none; /* Let the container handle clicks */
+      }
+
+      .toggle-switch--on .toggle-thumb {
+        transform: translateX(20px);
+      }
+
+      .custom-select {
+        appearance: none;
+        padding: 8px 36px 8px 16px;
+        border-radius: 8px;
+        border: 1px solid var(--card-border-color);
+        background-color: var(--view-bg-color);
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239da5b4'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+        color: var(--view-fg-color);
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        min-width: 160px;
+        transition: all 0.2s;
+      }
+
+      .custom-select:focus {
+        border-color: var(--accent-color);
+        box-shadow: var(--shadow-glow);
+      }
+
+      .seg-control {
+        display: inline-flex;
+        align-items: center;
+        background: var(--window-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 8px;
+        padding: 4px;
+      }
+
+      .seg-btn {
+        padding: 6px 16px;
+        border-radius: 6px;
+        color: var(--dim-label-color);
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+
+      .seg-btn:hover:not(.seg-btn--active) {
+        color: var(--window-fg-color);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .seg-btn--active {
+        background: var(--accent-bg-color);
+        color: var(--window-bg-color);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        cursor: default;
+      }
+      
+      .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        min-width: 120px;
+        max-width: 100%;
+      }
+
+      .hs-slider {
+        flex: 1;
+        height: 6px;
+        appearance: none;
+        border-radius: 999px;
+        background: var(--card-border-color);
+        accent-color: var(--accent-color);
+        cursor: ew-resize;
+      }
+
+      .slider-readout {
+        min-width: 48px;
+        text-align: right;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--dim-label-color);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .rate-chips {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        max-width: 360px;
+      }
+
+      .rate-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid color-mix(in srgb, var(--accent-color) 40%, transparent);
+        background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+        color: var(--accent-color);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .rate-chip__remove {
+        width: 16px;
+        height: 16px;
+        padding: 0;
+        border-radius: 50%;
+        color: inherit;
+        opacity: 0.7;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .rate-chip__remove:hover {
+        opacity: 1;
+        background: color-mix(in srgb, #f87171 20%, transparent);
+        color: #f87171;
+      }
+
+      .rate-chip--add {
+        border-style: dashed;
+        background: transparent;
+        cursor: pointer;
+      }
+      
+      .rate-chip--add:hover {
+        background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+      }
+
+      /* New Custom Feature Buttons */
+      .feature-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 12px;
+      }
+      .feature-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 10px;
+        padding: 18px 8px;
+        border-radius: 14px;
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .feature-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      }
+      .feature-btn--active {
+        background: color-mix(in srgb, var(--accent-bg-color) 15%, transparent);
+        border-color: color-mix(in srgb, var(--accent-color) 50%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-color) 20%, transparent), 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .feature-btn--active:hover {
+        background: color-mix(in srgb, var(--accent-bg-color) 20%, transparent);
+      }
+      .feature-btn__icon {
+        width: 32px;
+        height: 32px;
+        color: var(--dim-label-color);
+        transition: color 0.2s;
+      }
+      .feature-btn--active .feature-btn__icon {
+        color: var(--accent-color);
+        filter: drop-shadow(0 0 8px rgba(4, 191, 191, 0.4));
+      }
+      .feature-btn__title {
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--window-fg-color);
+      }
+      .feature-btn--active .feature-btn__title {
+        color: var(--accent-color);
+      }
+      .feature-btn__subtitle {
+        font-size: 11px;
+        color: var(--dim-label-color);
+        line-height: 1.2;
+        margin-top: 2px;
+      }
+      
+      /* New Refresh Rate Gauge/Block */
+      .hz-group {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 20px;
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        border-radius: 14px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .hz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .hz-title {
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .hz-current {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--accent-color);
+        font-variant-numeric: tabular-nums;
+        line-height: 1;
+        text-shadow: var(--shadow-glow-strong);
+      }
+      .hz-track {
+        display: flex;
+        gap: 8px;
+      }
+      .hz-pill {
+        flex: 1;
+        padding: 12px 4px;
+        text-align: center;
+        border-radius: 10px;
+        background: var(--view-bg-color);
+        border: 1px solid var(--card-border-color);
+        font-weight: 600;
+        font-size: 13px;
+        color: var(--dim-label-color);
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .hz-pill:hover:not(.hz-pill--active) {
+        color: var(--window-fg-color);
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .hz-pill--active {
+        background: var(--accent-color);
+        color: var(--window-bg-color);
+        border-color: var(--accent-color);
+        box-shadow: 0 4px 12px rgba(4, 191, 191, 0.3);
+      }
+
+      /* Grid Profiles List */
+      .action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 8px;
+        color: var(--accent-color);
+        font-weight: 600;
+        transition: background 0.2s;
+      }
+
+      .action-btn:hover:not(:disabled) {
+        background: color-mix(in srgb, var(--accent-color) 10%, transparent);
+      }
+      
+      .action-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: transparent;
+      }
+
+      .profile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+        gap: 16px;
+        padding-top: 4px;
+      }
+
+      .profile-card {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        padding: 16px;
+        border-radius: 14px;
+        background: var(--card-bg-color);
+        border: 1px solid var(--card-border-color);
+        cursor: pointer;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        text-align: left;
+      }
+
+      .profile-card:hover:not(.profile-card--active) {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: color-mix(in srgb, var(--accent-color) 30%, transparent);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+      }
+
+      .profile-card--active {
+        background: color-mix(in srgb, var(--accent-bg-color) 12%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent-color) 50%, transparent);
+        box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--accent-color) 20%, transparent), var(--shadow-glow);
+      }
+
+      .profile-card__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
+      }
+
+      .profile-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--view-bg-color);
+        border: 1px solid var(--card-border-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dim-label-color);
+        transition: color 0.2s, background 0.2s;
+      }
+      
+      .profile-card:hover .profile-icon {
+        color: var(--window-fg-color);
+      }
+
+      .profile-card--active .profile-icon {
+        background: var(--accent-color);
+        color: var(--window-bg-color);
+        border: none;
+        box-shadow: 0 2px 8px rgba(4, 191, 191, 0.4);
+      }
+
+      .profile-card__title {
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--window-fg-color);
+        margin: 0;
+      }
+
+      .profile-card__subtitle {
+        font-size: 11px;
+        color: var(--dim-label-color);
+        margin-top: 4px;
+      }
+
+      .profile-card--active .profile-card__title {
+        color: var(--accent-color);
+      }
+
+      .profile-status {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--accent-color);
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: color-mix(in srgb, var(--accent-color) 15%, transparent);
+        padding: 4px 8px;
+        border-radius: 6px;
+      }
+
+      .section-header__actions {
+        display: flex;
+        flex-shrink: 0;
+        align-items: flex-end;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell" role="application" aria-label="Settings">
+      <div class="shell__split">
+        
+        <!-- SIDEBAR PANE -->
+        <div class="shell__sidebar-pane">
+          <header class="headerbar">
+            <h1 class="headerbar__title">Settings</h1>
+            <div class="headerbar__controls">
+              <button type="button" class="headerbar__window-btn" aria-label="Menu">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+              </button>
+            </div>
+          </header>
+          
+          <div class="sidebar">
+            <div class="section-search-wrap">
+              <label class="section-search">
+                <svg class="section-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="search" placeholder="Search settings" aria-label="Search settings" />
+              </label>
+            </div>
+            
+            <div class="sidebar__scroller">
+              <ul class="sidebar__list">
+                <li class="sidebar__row sidebar__row--selected">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                  Display
+                </li>
+                <li class="sidebar__row">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  Appearance
+                </li>
+                <li class="sidebar__row">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-6M6 20V10M18 20V4"></path></svg>
+                  Performance
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT PANE -->
+        <div class="shell__content-pane">
+          
+          <!-- Trial Banner Floating Toast -->
+          <div class="trial-banner" id="trial-banner" aria-live="polite">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+            <span class="trial-banner__message">Refresh rate changed on DP-6. Reverting in 12s.</span>
+            <div class="trial-banner__actions">
+              <button type="button" class="trial-btn trial-btn--revert" onclick="hideTrial()">Revert</button>
+              <button type="button" class="trial-btn trial-btn--keep" onclick="hideTrial()">Keep changes</button>
+            </div>
+          </div>
+
+          <div class="views-slider" id="views-slider">
+            
+            <!-- MAIN VIEW -->
+            <div class="view view--main">
+              <header class="headerbar headerbar--transparent">
+                <div class="headerbar__title"></div>
+                <div class="headerbar__controls">
+                  <button type="button" class="headerbar__window-btn headerbar__window-btn--close" aria-label="Close">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                  </button>
+                </div>
+              </header>
+
+              <!-- Main Scrollable Area -->
+              <div class="page-content">
+                
+                <!-- Arrangement Visualization -->
+                <section>
+                  <div class="section-header">
+                    <div>
+                      <h2 class="section-title">Arrangement</h2>
+                      <p class="section-subtitle">Drag to rearrange. Snaps to align edges.</p>
+                    </div>
+                  </div>
+                  
+                  <div class="monitor-canvas" id="monitor-canvas">
+                    <!-- Monitors injected dynamically by JS -->
+                  </div>
+                </section>
+
+              <!-- Selected Output & Settings Dashboard (Bento Layout) -->
+              <section>
+                <div class="section-header">
+                  <div>
+                    <h2 class="section-title" id="active-monitor-title">
+                      HP Inc. HP P27 G5
+                      <span class="badge" id="active-monitor-badge">DP-6</span>
+                      <span class="badge hs-badge--tag" id="active-monitor-tag" title="Host: DP 1.4 · HBR3 ×4&#10;Sink: DisplayPort 1">DP 1.4 · HBR3 ×4</span>
+                    </h2>
+                    <p class="section-subtitle" id="active-monitor-subtitle">Monitor • Focused • 1920×1080@60 • 0, 0</p>
+                  </div>
+                </div>
+
+                <div class="bento-grid">
+                  <!-- LEFT COLUMN (Display Mode & Global) -->
+                  <div class="bento-col">
+                    
+                    <div class="boxed-group">
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Use this display</p>
+                          <p class="boxed-row__subtitle">Power on and output to DP-6</p>
+                        </div>
+                        <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true"><span class="toggle-thumb"></span></div>
+                      </div>
+
+                      <div class="boxed-row">
+                        <div class="boxed-row__text"><p class="boxed-row__title">Resolution</p></div>
+                        <select class="custom-select" aria-label="Resolution">
+                          <option selected>1920 × 1080</option>
+                          <option>1680 × 1050</option>
+                          <option>1600 × 900</option>
+                          <option>1280 × 1024</option>
+                          <option>1440 × 900</option>
+                          <option>1280 × 800</option>
+                          <option>1280 × 720</option>
+                        </select>
+                      </div>
+
+                      <div class="boxed-row">
+                        <div class="boxed-row__text"><p class="boxed-row__title">Scale</p></div>
+                        <div class="seg-control">
+                          <button type="button" class="seg-btn seg-btn--active">1×</button>
+                          <button type="button" class="seg-btn">1.25×</button>
+                          <button type="button" class="seg-btn">1.5×</button>
+                        </div>
+                      </div>
+
+                      <div class="boxed-row">
+                        <div class="boxed-row__text"><p class="boxed-row__title">Rotation</p></div>
+                        <div class="seg-control">
+                          <button type="button" class="seg-btn seg-btn--active">0°</button>
+                          <button type="button" class="seg-btn">90°</button>
+                          <button type="button" class="seg-btn">180°</button>
+                          <button type="button" class="seg-btn">270°</button>
+                        </div>
+                      </div>
+
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Flipped</p>
+                          <p class="boxed-row__subtitle">Mirror horizontally</p>
+                        </div>
+                        <div class="toggle-switch" role="switch" aria-checked="false"><span class="toggle-thumb"></span></div>
+                      </div>
+                    </div>
+
+                    <div class="boxed-group">
+                      <div class="boxed-row" style="background: rgba(255,255,255,0.02);">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title" style="color: var(--accent-color);">Global Environment</p>
+                        </div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Brightness</p>
+                          <p class="boxed-row__subtitle">Applies to all displays</p>
+                        </div>
+                        <div class="slider-row">
+                          <input type="range" class="hs-slider" min="0" max="100" value="55" aria-label="Brightness" />
+                          <span class="slider-readout">55%</span>
+                        </div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Sync displays</p>
+                          <p class="boxed-row__subtitle">Move universally</p>
+                        </div>
+                        <div class="toggle-switch toggle-switch--on" role="switch" aria-checked="true"><span class="toggle-thumb"></span></div>
+                      </div>
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Night light</p>
+                          <p class="boxed-row__subtitle">Following schedule</p>
+                        </div>
+                        <div class="toggle-switch" role="switch" aria-checked="false"><span class="toggle-thumb"></span></div>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <!-- RIGHT COLUMN (Performance & Tuning) -->
+                  <div class="bento-col">
+                    
+                    <div class="hz-group">
+                      <div class="hz-header">
+                        <div>
+                          <div class="hz-title">Refresh Rate</div>
+                          <div style="font-size: 11px; color: var(--dim-label-color); margin-top: 2px;">Smoothness and motion clarity</div>
+                        </div>
+                        <div class="hz-current">60<span style="font-size: 14px; color: var(--dim-label-color); font-weight: 600;"> Hz</span></div>
+                      </div>
+                      <div class="hz-track js-trigger-trial">
+                        <button class="hz-pill">50</button>
+                        <button class="hz-pill hz-pill--active">60</button>
+                        <button class="hz-pill">75</button>
+                        <button class="hz-pill" style="border-style: dashed; background: transparent;" title="Add Custom">+</button>
+                      </div>
+                    </div>
+
+                    <div class="feature-grid">
+                      <button class="feature-btn feature-btn--active" role="switch" aria-checked="true">
+                        <svg class="feature-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.13 15.57a10 10 0 1 0 3.43-11.44l-4.56 4.56"/><path d="M2.5 22v-6h6M21.87 8.43a10 10 0 1 0-3.43 11.44l4.56-4.56"/></svg>
+                        <div>
+                          <div class="feature-btn__title">Adaptive Sync</div>
+                          <div class="feature-btn__subtitle">Match draw rate</div>
+                        </div>
+                      </button>
+
+                      <button class="feature-btn feature-btn--active" role="switch" aria-checked="true">
+                        <svg class="feature-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg>
+                        <div>
+                          <div class="feature-btn__title">HDR</div>
+                          <div class="feature-btn__subtitle">High dynamic range</div>
+                        </div>
+                      </button>
+
+                      <button class="feature-btn" role="switch" aria-checked="false">
+                        <svg class="feature-btn__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path></svg>
+                        <div>
+                          <div class="feature-btn__title">10-bit Color</div>
+                          <div class="feature-btn__subtitle">Higher precision</div>
+                        </div>
+                      </button>
+                    </div>
+
+                    <div class="boxed-group">
+                      <div class="boxed-row boxed-row--dim">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Main display</p>
+                          <p class="boxed-row__subtitle">Hosts system bar</p>
+                        </div>
+                        <button type="button" class="action-btn" disabled>Main</button>
+                      </div>
+                    </div>
+
+                    <div class="boxed-group">
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Contrast</p>
+                        </div>
+                        <div class="slider-row">
+                          <input type="range" class="hs-slider" min="0" max="100" value="70" aria-label="Contrast" />
+                          <span class="slider-readout">70%</span>
+                        </div>
+                      </div>
+
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Overdrive</p>
+                        </div>
+                        <div class="slider-row">
+                          <input type="range" class="hs-slider" min="0" max="100" value="45" aria-label="Overdrive" />
+                          <span class="slider-readout">45%</span>
+                        </div>
+                      </div>
+
+                      <div class="boxed-row">
+                        <div class="boxed-row__text">
+                          <p class="boxed-row__title">Input source</p>
+                        </div>
+                        <select class="custom-select" aria-label="Input source">
+                          <option selected>DisplayPort 1</option>
+                          <option>HDMI 1</option>
+                          <option>HDMI 2</option>
+                        </select>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </section>
+
+              <!-- Layout Profiles -->
+              <section>
+                <div class="section-header">
+                  <div>
+                    <h2 class="section-title section-title--small">Layout Profiles</h2>
+                    <p class="section-subtitle">Automated arrangements applied by kanshi</p>
+                  </div>
+                  <div class="section-header__actions">
+                    <button type="button" class="action-btn">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                      Save current as…
+                    </button>
+                  </div>
+                </div>
+
+                <div class="profile-grid">
+                  
+                  <button type="button" class="profile-card" onclick="goToSubpage('home')">
+                    <div class="profile-card__header">
+                      <div class="profile-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                      </div>
+                    </div>
+                    <div>
+                      <p class="profile-card__title">home</p>
+                      <p class="profile-card__subtitle">3 configured outputs</p>
+                    </div>
+                  </button>
+
+                  <button type="button" class="profile-card profile-card--active" onclick="goToSubpage('docked')">
+                    <div class="profile-card__header">
+                      <div class="profile-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                      </div>
+                      <div class="profile-status">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Active
+                      </div>
+                    </div>
+                    <div>
+                      <p class="profile-card__title">docked</p>
+                      <p class="profile-card__subtitle">2 configured outputs</p>
+                    </div>
+                  </button>
+
+                  <button type="button" class="profile-card" onclick="goToSubpage('portable')">
+                    <div class="profile-card__header">
+                      <div class="profile-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+                      </div>
+                    </div>
+                    <div>
+                      <p class="profile-card__title">portable</p>
+                      <p class="profile-card__subtitle">1 configured output</p>
+                    </div>
+                  </button>
+
+                </div>
+              </section>
+
+              </div>
+            </div>
+
+            <!-- SUB VIEW: PROFILE DETAILS -->
+            <div class="view view--sub">
+              <header class="headerbar">
+                <div class="headerbar__controls" style="flex: 1;">
+                  <button class="headerbar__window-btn" onclick="goToMain()" type="button" style="width: auto; padding: 0 12px; gap: 8px; justify-content: flex-start; color: var(--window-fg-color);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back
+                  </button>
+                </div>
+                <div class="headerbar__title" id="subpage-title" style="flex: 2; text-align: center;">Profile: docked</div>
+                <div class="headerbar__controls" style="flex: 1; justify-content: flex-end;">
+                  <button type="button" class="headerbar__window-btn" style="color: #f87171;" aria-label="Delete Profile" onclick="goToMain()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  </button>
+                </div>
+              </header>
+
+              <div class="page-content" style="padding-top: 32px;">
+                <section>
+                  <div class="section-header">
+                    <div>
+                      <h2 class="section-title">Saved Outputs</h2>
+                      <p class="section-subtitle">Displays configured in this arrangement</p>
+                    </div>
+                  </div>
+                  <div class="boxed-group">
+                    <div class="boxed-row">
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">HP Inc. HP P27 G5 (DP-6)</p>
+                        <p class="boxed-row__subtitle">Primary • 1920×1080 @ 60Hz • Scale 100%</p>
+                      </div>
+                      <div class="badge" style="font-variant-numeric: tabular-nums;">
+                        +1080, 0
+                      </div>
+                    </div>
+                    <div class="boxed-row">
+                      <div class="boxed-row__text">
+                        <p class="boxed-row__title">Built-in Display (eDP-1)</p>
+                        <p class="boxed-row__subtitle">1920×1200 @ 60Hz • Scale 125%</p>
+                      </div>
+                      <div class="badge" style="font-variant-numeric: tabular-nums;">
+                        0, 0
+                      </div>
+                    </div>
+                  </div>
+                </section>
+                
+                <section style="margin-top: 24px;">
+                  <button class="action-btn" onclick="goToMain()" style="width: 100%; justify-content: center; background: color-mix(in srgb, var(--accent-bg-color) 15%, transparent); padding: 12px; border: 1px solid color-mix(in srgb, var(--accent-color) 30%, transparent);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    Apply Profile Now
+                  </button>
+                </section>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ==== SUBPAGE NAVIGATION ==== */
+      function goToSubpage(profileName) {
+        document.getElementById('subpage-title').innerText = 'Profile: ' + profileName;
+        document.getElementById('views-slider').style.transform = 'translateX(-50%)';
+      }
+
+      function goToMain() {
+        document.getElementById('views-slider').style.transform = 'translateX(0)';
+      }
+
+      /* ==== UI COMPONENT INTERACTIVITY ==== */
+      // Toggles
+      document.querySelectorAll('.toggle-switch').forEach(toggle => {
+        toggle.addEventListener('click', function() {
+          this.classList.toggle('toggle-switch--on');
+          const isChecked = this.getAttribute('aria-checked') === 'true';
+          this.setAttribute('aria-checked', !isChecked);
+        });
+      });
+
+      // Segmented Controls
+      document.querySelectorAll('.seg-control').forEach(control => {
+        const buttons = control.querySelectorAll('.seg-btn');
+        buttons.forEach(btn => {
+          btn.addEventListener('click', function() {
+            buttons.forEach(b => b.classList.remove('seg-btn--active'));
+            this.classList.add('seg-btn--active');
+            
+            // Show trial banner if it's the refresh rate control
+            if (control.classList.contains('js-trigger-trial')) {
+              showTrial();
+            }
+          });
+        });
+      });
+
+      // Feature Buttons (Grid)
+      document.querySelectorAll('.feature-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          this.classList.toggle('feature-btn--active');
+          const isChecked = this.getAttribute('aria-checked') === 'true';
+          this.setAttribute('aria-checked', !isChecked);
+        });
+      });
+
+      // Refresh Rate Pills
+      document.querySelectorAll('.hz-pill').forEach(pill => {
+        pill.addEventListener('click', function() {
+          if (this.innerText === '+') return; // stub for adding custom
+          
+          const group = this.closest('.hz-group');
+          group.querySelectorAll('.hz-pill').forEach(p => p.classList.remove('hz-pill--active'));
+          this.classList.add('hz-pill--active');
+          
+          const currentDisplay = group.querySelector('.hz-current');
+          currentDisplay.innerHTML = `${this.innerText}<span style="font-size: 14px; color: var(--dim-label-color); font-weight: 600;"> Hz</span>`;
+          
+          if(group.querySelector('.js-trigger-trial')) {
+            showTrial();
+          }
+        });
+      });
+
+      // Trial Banner
+      function showTrial() {
+        document.getElementById('trial-banner').classList.add('is-visible');
+      }
+      function hideTrial() {
+        document.getElementById('trial-banner').classList.remove('is-visible');
+      }
+
+      // Sliders
+      document.querySelectorAll('.hs-slider').forEach((input) => {
+        const readout = input.parentElement?.querySelector('.slider-readout');
+        if (!readout) return;
+        const unit = readout.textContent.includes('K') ? ' K' : '%';
+        input.addEventListener('input', () => {
+          readout.textContent = `${Math.round(Number(input.value))}${unit}`;
+        });
+      });
+
+      /* ==== DRAG & DROP CANVAS LOGIC ==== */
+      const canvas = document.getElementById('monitor-canvas');
+      
+      // Virtual coordinates (1 unit = 1 pixel at 100% scale)
+      let monitors = [
+        { id: 'DP-3', name: 'LG Electronics', width: 1080, height: 1920, x: -1080, y: -300, primary: false },
+        { id: 'DP-6', name: 'HP Inc. HP P27 G5', width: 1920, height: 1080, x: 0, y: 0, primary: true },
+        { id: 'eDP-1', name: 'Built-in Display', width: 1920, height: 1200, x: 0, y: 1080, primary: false }
+      ];
+
+      let activeId = 'DP-6';
+      
+      // Interaction state
+      let isDragging = false;
+      let draggedMonitor = null;
+      let startMouseX = 0, startMouseY = 0;
+      let startMonX = 0, startMonY = 0;
+      let currentScale = 0.08; 
+      let offsetX = 0, offsetY = 0;
+
+      // Update UI elements based on active monitor
+      function updateSettingsPanel() {
+        const active = monitors.find(m => m.id === activeId);
+        if (!active) return;
+        const tag = active.id === 'DP-6'
+          ? '<span class="badge hs-badge--tag" id="active-monitor-tag" title="Host: DP 1.4 · HBR3 ×4\nSink: DisplayPort 1">DP 1.4 · HBR3 ×4</span>'
+          : '';
+        document.getElementById('active-monitor-title').innerHTML = `${active.name} <span class="badge" id="active-monitor-badge">${active.id}</span>${tag}`;
+        document.getElementById('active-monitor-subtitle').textContent = `Monitor${active.primary ? ' • Focused' : ''} • ${active.width}×${active.height}@60 • ${active.x}, ${active.y}`;
+      }
+
+      function calculateScaleAndOffset() {
+        if (!monitors.length) return;
+        
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        monitors.forEach(m => {
+          if (m.x < minX) minX = m.x;
+          if (m.y < minY) minY = m.y;
+          if (m.x + m.width > maxX) maxX = m.x + m.width;
+          if (m.y + m.height > maxY) maxY = m.y + m.height;
+        });
+
+        const totalWidth = maxX - minX;
+        const totalHeight = maxY - minY;
+        
+        const canvasRect = canvas.getBoundingClientRect();
+        const padding = 60; // minimum padding around the arrangement
+
+        // Calculate scale to fit all displays properly within canvas
+        const scaleX = (canvasRect.width - padding * 2) / totalWidth;
+        const scaleY = (canvasRect.height - padding * 2) / totalHeight;
+        currentScale = Math.min(scaleX, scaleY, 0.12); // Max scale limit to avoid huge monitors
+
+        // Center arrangement
+        const scaledWidth = totalWidth * currentScale;
+        const scaledHeight = totalHeight * currentScale;
+        
+        offsetX = (canvasRect.width - scaledWidth) / 2 - (minX * currentScale);
+        offsetY = (canvasRect.height - scaledHeight) / 2 - (minY * currentScale);
+      }
+
+      function render() {
+        canvas.innerHTML = '';
+        calculateScaleAndOffset();
+
+        monitors.forEach(m => {
+          const el = document.createElement('div');
+          el.className = `monitor-item ${m.id === activeId ? 'monitor-item--active' : ''}`;
+          el.dataset.id = m.id;
+          
+          el.style.width = `${m.width * currentScale}px`;
+          el.style.height = `${m.height * currentScale}px`;
+          el.style.left = `${offsetX + m.x * currentScale}px`;
+          el.style.top = `${offsetY + m.y * currentScale}px`;
+
+          let innerHTML = '';
+          if (m.primary) innerHTML += `<span class="monitor-item__badge">Primary</span>`;
+          innerHTML += `<span class="monitor-item__label">${m.id}</span>`;
+          innerHTML += `<span class="monitor-item__res">${m.width}×${m.height}</span>`;
+          el.innerHTML = innerHTML;
+
+          // Cross-device Drag Support
+          el.addEventListener('mousedown', handleDragStart);
+          el.addEventListener('touchstart', handleDragStart, {passive: false});
+
+          canvas.appendChild(el);
+        });
+
+        updateSettingsPanel();
+      }
+
+      function getPointerCoords(e) {
+        if (e.touches && e.touches.length > 0) {
+          return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        }
+        return { x: e.clientX, y: e.clientY };
+      }
+
+      function handleDragStart(e) {
+        if (e.type === 'touchstart') e.preventDefault(); // Stop screen scrolling
+        
+        const id = e.currentTarget.dataset.id;
+        activeId = id;
+        draggedMonitor = monitors.find(m => m.id === id);
+        
+        const coords = getPointerCoords(e);
+        startMouseX = coords.x;
+        startMouseY = coords.y;
+        startMonX = draggedMonitor.x;
+        startMonY = draggedMonitor.y;
+        isDragging = true;
+        
+        render(); // Immediately re-render to show active styling
+        
+        document.addEventListener('mousemove', handleDragMove);
+        document.addEventListener('touchmove', handleDragMove, {passive: false});
+        document.addEventListener('mouseup', handleDragEnd);
+        document.addEventListener('touchend', handleDragEnd);
+      }
+
+      function handleDragMove(e) {
+        if (!isDragging || !draggedMonitor) return;
+        e.preventDefault();
+
+        const coords = getPointerCoords(e);
+        const dx = (coords.x - startMouseX) / currentScale;
+        const dy = (coords.y - startMouseY) / currentScale;
+        
+        let newX = startMonX + dx;
+        let newY = startMonY + dy;
+
+        // Snapping Logic Threshold (px mapped to virtual units)
+        const snapThreshold = 30 / currentScale; 
+        
+        monitors.forEach(other => {
+          if (other.id === draggedMonitor.id) return;
+
+          // X-Axis Magnetic Alignments
+          const edgesX = [
+            { d: newX - other.x, snapTo: other.x },
+            { d: newX - (other.x + other.width), snapTo: other.x + other.width },
+            { d: (newX + draggedMonitor.width) - other.x, snapTo: other.x - draggedMonitor.width },
+            { d: (newX + draggedMonitor.width) - (other.x + other.width), snapTo: other.x + other.width - draggedMonitor.width }
+          ];
+
+          edgesX.forEach(edge => {
+            if (Math.abs(edge.d) < snapThreshold) newX = edge.snapTo;
+          });
+
+          // Y-Axis Magnetic Alignments
+          const edgesY = [
+            { d: newY - other.y, snapTo: other.y },
+            { d: newY - (other.y + other.height), snapTo: other.y + other.height },
+            { d: (newY + draggedMonitor.height) - other.y, snapTo: other.y - draggedMonitor.height },
+            { d: (newY + draggedMonitor.height) - (other.y + other.height), snapTo: other.y + other.height - draggedMonitor.height }
+          ];
+
+          edgesY.forEach(edge => {
+            if (Math.abs(edge.d) < snapThreshold) newY = edge.snapTo;
+          });
+        });
+
+        draggedMonitor.x = Math.round(newX);
+        draggedMonitor.y = Math.round(newY);
+
+        render(); // Continuously update positioning
+      }
+
+      function handleDragEnd() {
+        isDragging = false;
+        draggedMonitor = null;
+        document.removeEventListener('mousemove', handleDragMove);
+        document.removeEventListener('touchmove', handleDragMove);
+        document.removeEventListener('mouseup', handleDragEnd);
+        document.removeEventListener('touchend', handleDragEnd);
+        
+        // Recalculate zoom layout after movement completes
+        render(); 
+      }
+
+      // Initialize logic
+      window.addEventListener('resize', render);
+      render();
+    </script>
+  </body>
+</html>

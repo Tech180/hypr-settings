@@ -1,0 +1,19 @@
+[package]
+name = "presentation-gtk"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[dependencies]
+settings-application.workspace = true
+settings-domain.workspace = true
+async-channel.workspace = true
+tracing.workspace = true
+gtk4 = { version = "0.11", features = ["v4_12"] }
+libadwaita = { version = "0.9", features = ["v1_5"] }
+resvg = { version = "0.44", default-features = false }
+lucide-static-svg = "1.66.0"
+
+[lints]
+workspace = true

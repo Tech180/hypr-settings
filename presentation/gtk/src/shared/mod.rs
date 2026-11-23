@@ -1,0 +1,32 @@
+//! Components used by more than one feature.
+
+#[path = "badge/mod.rs"]
+pub mod badge;
+#[path = "button/mod.rs"]
+pub mod button;
+#[path = "dropdown/mod.rs"]
+pub mod dropdown;
+#[path = "select/mod.rs"]
+pub mod select;
+#[path = "icon/mod.rs"]
+pub mod icon;
+#[path = "icon-tile/mod.rs"]
+pub mod icon_tile;
+#[path = "pagination/mod.rs"]
+pub mod pagination;
+#[path = "search-field/mod.rs"]
+pub mod search_field;
+#[path = "section-header/mod.rs"]
+pub mod section_header;
+#[path = "segmented/mod.rs"]
+pub mod segmented;
+#[path = "settings-group/mod.rs"]
+pub mod settings_group;
+#[path = "slider/mod.rs"]
+pub mod slider;
+#[path = "subpage-bar/mod.rs"]
+pub mod subpage_bar;
+#[path = "tab-bar/mod.rs"]
+pub mod tab_bar;
+#[path = "toggle/mod.rs"]
+pub mod toggle;

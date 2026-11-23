@@ -1,0 +1,10 @@
+#[path = "advanced-page/mod.rs"]
+pub mod advanced_page;
+#[path = "device-detail/mod.rs"]
+pub mod device_detail;
+#[path = "device-row/mod.rs"]
+pub mod device_row;
+#[path = "main-page/mod.rs"]
+pub mod main_page;
+#[path = "scan-page/mod.rs"]
+pub mod scan_page;
